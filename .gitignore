@@ -1,0 +1,11 @@
+node_modules/
+venv/
+__pycache__/
+.env
+.DS_Store
+*.mp4
+*.m3u8
+.next/
+dist/
+build/
+postgres_data/
