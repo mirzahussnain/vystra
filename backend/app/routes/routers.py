@@ -1,19 +1,20 @@
 import uuid
 
-from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
-from sqlalchemy.orm import Session
 from app.core.config import settings
-from app.services.celery_client import celery_client
-from app.services.storage import   get_s3_client
-from app.models import models
 from app.database.database import get_db
+from app.models import models
+from app.services.celery_client import celery_client
+from app.services.storage import get_s3_client
+from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile
+from sqlalchemy.orm import Session
 
 router = APIRouter()
 
-BUCKET_NAME=settings._aws_bucket_name
+BUCKET_NAME = settings._aws_bucket_name
+
 
 @router.post("/upload")
-def upload_file(file: UploadFile = File(...),db:Session=Depends(get_db)):
+def upload_file(file: UploadFile = File(...), db: Session = Depends(get_db)):
     """
     1. Validates file type.
     2. Uploads to MinIO.
@@ -45,10 +46,8 @@ def upload_file(file: UploadFile = File(...),db:Session=Depends(get_db)):
         )
 
     new_video = models.Video(
-            id=unique_filename,
-            title=file.filename,
-            s3_key=unique_filename
-        )
+        id=unique_filename, title=file.filename, s3_key=unique_filename
+    )
     db.add(new_video)
     db.commit()
     db.refresh(new_video)
@@ -64,3 +63,19 @@ def upload_file(file: UploadFile = File(...),db:Session=Depends(get_db)):
         "task_id": task.id,
         "message": "Video uploaded successfully. Processing started.",
     }
+
+
+@router.get("/search")
+async def search_videos(
+    query: str = Query(..., min_length=3), db: Session = Depends(get_db)
+):
+    # Search for videos where the transcript contains the query string
+    # ilike = Case Insensitive Like (e.g., "Desire" finds "desire")
+    results = (
+        db.query(models.Video).filter(models.Video.transcript.ilike(f"%{query}%")).all()
+    )
+
+    if not results:
+        return {"message": "No matches found.", "results": []}
+
+    return {"count": len(results), "query": query, "results": results}
