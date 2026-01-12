@@ -1,5 +1,6 @@
 node_modules/
 venv/
+insightstream-venv/
 __pycache__/
 *.py[cod]
 .env
@@ -10,4 +11,5 @@ __pycache__/
 dist/
 build/
 postgres_data/
+minio_data/
 redis_data/
