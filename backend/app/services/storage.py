@@ -1,12 +1,11 @@
 import boto3
 from botocore.exceptions import NoCredentialsError
-import os
+from app.core.config import settings
 
-# Get configs from Environment Variables (set in docker-compose)
-AWS_ACCESS_KEY = os.getenv("AWS_ACCESS_KEY_ID")
-AWS_SECRET_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
-AWS_ENDPOINT = os.getenv("AWS_ENDPOINT_URL")
-BUCKET_NAME = os.getenv("AWS_BUCKET_NAME", "videos")
+AWS_ACCESS_KEY = settings._aws_access_key_id
+AWS_SECRET_KEY = settings._aws_secret_access_key
+AWS_ENDPOINT = settings._aws_endpoint_url
+BUCKET_NAME = settings._aws_bucket_name
 
 def get_s3_client():
     """Create a connection to MinIO/S3"""

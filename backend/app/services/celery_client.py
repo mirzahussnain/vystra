@@ -1,8 +1,8 @@
-import os
 from celery import Celery
+from app.core.config import settings
 
 # Get Redis URL from environment
-REDIS_URL = os.getenv("REDIS_URL", "redis://redis:6379/0")
+REDIS_URL = settings._redis_url
 
 # Initialize the "Sender"
 celery_client = Celery(
