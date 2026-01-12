@@ -1,0 +1,63 @@
+version: '3.8'
+services:
+   # 1. The Message Broker (The Post Office)
+   redis:
+      image: redis:8.4-alpine
+      ports:
+         - "6379:6379"
+  # 2. The Database (The Warehouse)
+   db:
+     image: postgres:15-alpine
+     environment:
+        POSTGRES_USER: ${POSTGRES_USER}
+        POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+        POSTGRES_DB: ${POSTGRES_DB}
+     volumes:
+         - ./postgres_data:/var/lib/postgresql/data
+     ports:
+         - "5432:5432"
+  # 3. The API Gateway (The Receptionist)
+   backend:
+      build: ./backend
+      ports:
+          - "8000:8000"
+      volumes:
+          - ./backend:/app
+      environment:
+          - REDIS_URL=${REDIS_URL}
+          - DATABASE_URL=${DATABASE_URL}
+          - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+          - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+          - AWS_ENDPOINT_URL=${AWS_ENDPOINT_URL}
+          - AWS_BUCKET_NAME=${AWS_BUCKET_NAME}
+      depends_on:
+          - redis
+          - db
+      
+     
+  # 4. The AI Worker (The Factory)
+   worker:
+         build: ./worker
+         volumes:
+            - ./worker:/app
+         environment:
+            - REDIS_URL=${REDIS_URL}
+            - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+            - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+            - AWS_ENDPOINT_URL=${AWS_ENDPOINT_URL}
+            - AWS_BUCKET_NAME=${AWS_BUCKET_NAME}
+         depends_on:
+            - redis
+            - backend
+  # 5. Object Storage (AWS S3 Clone)
+   minio:
+      image: minio/minio
+      ports:
+        - "9000:9000"  # The API Port (Code talks to this)
+        - "9001:9001"  # The Console Port (Login here in Browser)
+      environment:
+        MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+        MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      volumes:
+        - ./minio_data:/data
+      command: server /data --console-address ":9001"
