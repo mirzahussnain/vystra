@@ -1,10 +1,11 @@
-
+import logging
 import os
 import whisper
 from app.core.config import settings
 from app.services import video as video_service
 from app.database import database as db
 from celery import Celery
+from app.database.database import VideoStatus
 
 
 _redis_url = settings._redis_url
@@ -43,13 +44,23 @@ def process_video_task(video_id: str):
         # 3. Transcribe (The AI Magic)
         print("🤖 Transcribing audio with Whisper...")
         result = model.transcribe(audio_path)
+        
+        # A. The Full Text (For general search)
         transcript_text =str( result["text"])
         
-        print(f"📝 TRANSCRIPT PREVIEW: {transcript_text[:100]}...") # Print first 100 chars
-                
+        # B. The Segments (For timestamp search)
+       
+        segments = result["segments"]
+        clean_segments = []
+        for s in segments:
+                    clean_segments.append({
+                        "start": s["start"], # Seconds (e.g., 12.5)
+                        "end": s["end"],
+                        "text": s["text"].strip()
+                    })
         # --- SAVE TO DB ---
         print("💾 Saving to Database...")
-        db.update_video_transcript(video_id, transcript_text)
+        db.update_video_transcript(video_id,status=VideoStatus.COMPLETED.value,transcript=transcript_text,segments=clean_segments)
         
         return {
                     "status": "completed",
@@ -57,6 +68,7 @@ def process_video_task(video_id: str):
                     "transcript_preview": transcript_text[:50]
                         }
     except Exception as e:
+        db.update_video_transcript(video_id,status=VideoStatus.FAILED.value)
         print(f"❌ CRITICAL ERROR: {e}")
         return {"status": "failed", "error": str(e)}
     finally:

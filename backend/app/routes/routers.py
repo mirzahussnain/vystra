@@ -7,13 +7,15 @@ from app.services.celery_client import celery_client
 from app.services.storage import get_s3_client
 from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile
 from sqlalchemy.orm import Session
+from app.database.schema import UploadVideoResponse, VideoResponse
+from sqlalchemy import  or_
 
 router = APIRouter()
 
 BUCKET_NAME = settings._aws_bucket_name
 
 
-@router.post("/upload")
+@router.post("/upload",response_model=UploadVideoResponse)
 def upload_file(file: UploadFile = File(...), db: Session = Depends(get_db)):
     """
     1. Validates file type.
@@ -46,7 +48,7 @@ def upload_file(file: UploadFile = File(...), db: Session = Depends(get_db)):
         )
 
     new_video = models.Video(
-        id=unique_filename, title=file.filename, s3_key=unique_filename
+        id=unique_filename, title=file.filename, s3_key=unique_filename,status=models.VideoStatus.PROCESSING.value
     )
     db.add(new_video)
     db.commit()
@@ -58,24 +60,61 @@ def upload_file(file: UploadFile = File(...), db: Session = Depends(get_db)):
         args=[unique_filename],
     )
     return {
-        "status": "queued",
-        "video_id": unique_filename,
+        "video_data": new_video,
         "task_id": task.id,
         "message": "Video uploaded successfully. Processing started.",
     }
 
 
-@router.get("/search")
-async def search_videos(
-    query: str = Query(..., min_length=3), db: Session = Depends(get_db)
+# def get_video(video_id:str, db:Session=Depends(get_db)):
+    video =db.query(models.Video).filter(models.Video.id==video_id).first()
+    if video is None:
+        raise HTTPException(status_code=404,detail="Video not found")
+    return video
+    
+@router.get("/videos", response_model=list[VideoResponse])
+def get_videos(
+    search: str = None,  
+    limit: int = 100, 
+    db: Session = Depends(get_db)
 ):
-    # Search for videos where the transcript contains the query string
-    # ilike = Case Insensitive Like (e.g., "Desire" finds "desire")
-    results = (
-        db.query(models.Video).filter(models.Video.transcript.ilike(f"%{query}%")).all()
-    )
+    query = db.query(models.Video)
+    
+    if search:
+        # The Magic Logic:
+        # Search inside the TITLE OR inside the TRANSCRIPT
+        # 'ilike' makes it Case-Insensitive (User types "budget", matches "Budget")
+        search_filter = or_(
+            models.Video.title.ilike(f"%{search}%"),
+            models.Video.transcript.ilike(f"%{search}%")
+        )
+        query = query.filter(search_filter)
+    
+    # Always sort by newest first
+    return query.order_by(models.Video.created_at.desc()).limit(limit).all()
 
-    if not results:
-        return {"message": "No matches found.", "results": []}
 
-    return {"count": len(results), "query": query, "results": results}
+# def update_video(video_id:str,title:str,db:Session=Depends(get_db)):
+#     video=db.query(models.Video).filter(models.Video.id==video_id).first()
+#     if video is None:
+#         raise HTTPException(status_code=404,detail="Video not found")
+        
+#     video.title=title
+#     db.commit()
+#     db.refresh(video)
+#     return video
+
+# @router.get("/search")
+# async def search_videos(
+#     query: str = Query(..., min_length=3), db: Session = Depends(get_db)
+# ):
+#     # Search for videos where the transcript contains the query string
+#     # ilike = Case Insensitive Like (e.g., "Desire" finds "desire")
+#     results = (
+#         db.query(models.Video).filter(models.Video.transcript.ilike(f"%{query}%")).all()
+#     )
+
+#     if not results:
+#         return {"message": "No matches found.", "results": []}
+
+#     return {"count": len(results), "query": query, "results": results}
