@@ -1,17 +1,17 @@
-import logging
+
 import os
 import whisper
 from app.core.config import settings
-from app.services import video as video_service
-from app.database import database as db
+from app.services import ffmpeg,database,storage
+from app.database.config import get_db
 from celery import Celery
-from app.database.database import VideoStatus
+from app.database.enums import VideoStatus
 
 
-_redis_url = settings._redis_url
 
 
-celery_app = Celery("insightstream_worker", broker=_redis_url, backend=_redis_url)
+
+celery_app = Celery("insightstream_worker", broker=settings.REDIS_URL, backend=settings.REDIS_URL)
 
 
 # Load the AI Model (Global Variable)
@@ -36,10 +36,10 @@ def process_video_task(video_id: str):
     
     try:
         # 1. Download the video from S3
-        video_service.download_video(video_id, video_path)
+        storage.download_video(video_id, video_path)
         
         # 2. Extract Audio
-        video_service.extract_audio(video_path, audio_path)
+        ffmpeg.extract_audio(video_path, audio_path)
         
         # 3. Transcribe (The AI Magic)
         print("🤖 Transcribing audio with Whisper...")
@@ -60,7 +60,7 @@ def process_video_task(video_id: str):
                     })
         # --- SAVE TO DB ---
         print("💾 Saving to Database...")
-        db.update_video_transcript(video_id,status=VideoStatus.COMPLETED.value,transcript=transcript_text,segments=clean_segments)
+        database.update_video_transcript(video_id,status=VideoStatus.COMPLETED.value,transcript=transcript_text,segments=clean_segments)
         
         return {
                     "status": "completed",
@@ -68,7 +68,7 @@ def process_video_task(video_id: str):
                     "transcript_preview": transcript_text[:50]
                         }
     except Exception as e:
-        db.update_video_transcript(video_id,status=VideoStatus.FAILED.value)
+        database.update_video_transcript(video_id,status=VideoStatus.FAILED.value)
         print(f"❌ CRITICAL ERROR: {e}")
         return {"status": "failed", "error": str(e)}
     finally:

@@ -11,6 +11,7 @@ class Settings:
     _aws_secret_access_key = os.getenv("AWS_SECRET_ACCESS_KEY", "minioadmin")
     _aws_endpoint_url = os.getenv("AWS_ENDPOINT_URL", "http://minio:9000")
     _bucket_name = os.getenv("AWS_BUCKET_NAME", "videos")
+    _grok_api_key=os.getenv("GROK_API_KEY")
 
     if _redis_url is None:
         raise ValueError("REDIS_URL is not set in .env file")
@@ -22,6 +23,10 @@ class Settings:
         raise ValueError("AWS_ENDPOINT_URL is not set in .env file")
     if _bucket_name is None:
         raise ValueError("AWS_BUCKET_NAME is not set in .env file")
+    if _grok_api_key is None:
+        raise ValueError("GROK_API_KEY is not set in .env file")
+    if _database_url is None:
+        raise ValueError("DATABASE_URL is not set in .env file")
 
     # Redis
     REDIS_URL: str = _redis_url
@@ -32,5 +37,10 @@ class Settings:
     AWS_ENDPOINT_URL: str = _aws_endpoint_url
     AWS_BUCKET_NAME: str = _bucket_name
 
+    # Database
+    DATABASE_URL: str = _database_url
+
+    # Grok API
+    GROK_API_KEY: str = _grok_api_key
 
 settings = Settings()

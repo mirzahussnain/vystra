@@ -2,9 +2,9 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.database.database import Base, engine
-from app.models import models
-from app.routes.routers import router as video_router
+from pydantic.types import SecretType
+from app.database.config import Base, engine
+from app.routes.videos import router as video_router
 from app.services.storage import init_bucket
 from app.core.config import settings
 
@@ -23,9 +23,9 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="InsightStream API", lifespan=lifespan)
 
-origins=settings._allowed_origins
-if origins is not None:
-    origins=[origin.strip() for origin in origins.split(",") if origin.strip()]
+print(settings.ALLOWED_ORIGINS)
+
+origins=[origin.strip() for origin in settings.ALLOWED_ORIGINS.split(",") if origin.strip()]
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins if origins is not None else [""],

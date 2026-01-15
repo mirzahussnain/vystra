@@ -1,14 +1,6 @@
-import enum
-
-from app.database.database import Base
-from sqlalchemy import JSON, Column, DateTime, Enum, String, Text
-from sqlalchemy.sql import func
-
-
-class VideoStatus(str, enum.Enum):
-    PROCESSING = "processing"
-    COMPLETED = "completed"
-    FAILED = "failed"
+from sqlalchemy import JSON, Column, DateTime, Enum, String, Text, func
+from app.database.config import Base
+from app.database.enums import VideoStatus
 
 
 class Video(Base):

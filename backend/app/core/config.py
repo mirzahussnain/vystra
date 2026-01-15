@@ -6,7 +6,7 @@ class SETTINGS:
     VERSION: str = "1.0.0"
 
     _allowed_origins=os.getenv("ALLOWED_ORIGINS")
-    _database_url: str = str(os.getenv("DATABASE_URL"))
+    _database_url = str(os.getenv("DATABASE_URL"))
     _redis_url = os.getenv("REDIS_URL", "redis://redis:6379/0")
     _aws_access_key_id = os.getenv("AWS_ACCESS_KEY_ID", "minioadmin")
     _aws_secret_access_key = os.getenv("AWS_SECRET_ACCESS_KEY", "minioadmin")
@@ -38,5 +38,13 @@ class SETTINGS:
     if _environment is None:
         raise ValueError("ENVIRONMENT environment variable is not set")
   
+    AWS_ACCESS_KEY_ID = _aws_access_key_id
+    AWS_SECRET_ACCESS_KEY = _aws_secret_access_key
+    AWS_ENDPOINT_URL = _aws_endpoint_url
+    AWS_BUCKET_NAME = _aws_bucket_name
+    ENVIRONMENT = _environment
+    ALLOWED_ORIGINS = _allowed_origins
+    DATABASE_URL = _database_url
+    REDIS_URL = _redis_url
 
 settings = SETTINGS()

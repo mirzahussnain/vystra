@@ -1,20 +1,19 @@
 import uuid
-from webbrowser import get
-
 from app.core.config import settings
-from app.database.database import get_db
-from app.models import models
+from app.database.config import get_db
+from app.database.models import Video
 from app.services.celery_client import celery_client
 from app.services.storage import get_s3_client
-from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile
+from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 from sqlalchemy.orm import Session
 from app.database.schema import UploadVideoResponse, VideoResponse
 from sqlalchemy import  or_
 
+from app.database.enums import VideoStatus
+
 router = APIRouter()
 
-BUCKET_NAME = settings._aws_bucket_name
-ENVIRONMENT = settings._environment
+
 
 @router.post("/upload",response_model=UploadVideoResponse)
 def upload_file(file: UploadFile = File(...), db: Session = Depends(get_db)):
@@ -38,7 +37,7 @@ def upload_file(file: UploadFile = File(...), db: Session = Depends(get_db)):
         # We use upload_fileobj because 'file.file' is a stream
         client.upload_fileobj(
             file.file,
-            BUCKET_NAME,
+            settings.AWS_BUCKET_NAME,
             unique_filename,
             ExtraArgs={"ContentType": file.content_type},
         )
@@ -48,8 +47,8 @@ def upload_file(file: UploadFile = File(...), db: Session = Depends(get_db)):
             status_code=500, detail="Failed to upload video to storage."
         )
 
-    new_video = models.Video(
-        id=unique_filename, title=file.filename, s3_key=unique_filename,status=models.VideoStatus.PROCESSING.value
+    new_video = Video(
+        id=unique_filename, title=file.filename, s3_key=unique_filename,status=VideoStatus.PROCESSING.value
     )
     db.add(new_video)
     db.commit()
@@ -67,11 +66,6 @@ def upload_file(file: UploadFile = File(...), db: Session = Depends(get_db)):
     }
 
 
-# def get_video(video_id:str, db:Session=Depends(get_db)):
-    video =db.query(models.Video).filter(models.Video.id==video_id).first()
-    if video is None:
-        raise HTTPException(status_code=404,detail="Video not found")
-    return video
     
 @router.get("/videos", response_model=list[VideoResponse])
 def get_videos(
@@ -79,24 +73,24 @@ def get_videos(
     limit: int = 100, 
     db: Session = Depends(get_db)
 ):
-    query = db.query(models.Video)
+    query = db.query(Video)
     
     if search:
         # The Magic Logic:
         # Search inside the TITLE OR inside the TRANSCRIPT
         # 'ilike' makes it Case-Insensitive (User types "budget", matches "Budget")
         search_filter = or_(
-            models.Video.title.ilike(f"%{search}%"),
-            models.Video.transcript.ilike(f"%{search}%")
+            Video.title.ilike(f"%{search}%"),
+            Video.transcript.ilike(f"%{search}%")
         )
         query = query.filter(search_filter)
     
     # Always sort by newest first
-    return query.order_by(models.Video.created_at.desc()).limit(limit).all()
+    return query.order_by(Video.created_at.desc()).limit(limit).all()
 
 @router.get("/videos/{video_id}",response_model=VideoResponse)
 def get_video(video_id: str, db: Session = Depends(get_db)):
-    video = db.query(models.Video).filter(models.Video.id == video_id).first()
+    video = db.query(Video).filter(Video.id == video_id).first()
     if not video:
         raise HTTPException(status_code=404, detail="Video not found")
     return video
@@ -108,7 +102,7 @@ def get_video_url(video_id: str, db: Session = Depends(get_db)):
     - Local: Returns http://localhost:9000/...
     - Prod: Returns https://s3.us-west-004.backblazeb2.com/...
     """
-    video = db.query(models.Video).filter(models.Video.id == video_id).first()
+    video = db.query(Video).filter(Video.id == video_id).first()
     if not video:
         raise HTTPException(status_code=404, detail="Video not found")
 
@@ -117,13 +111,13 @@ def get_video_url(video_id: str, db: Session = Depends(get_db)):
         client = get_s3_client()
         url = client.generate_presigned_url(
             'get_object',
-            Params={'Bucket': BUCKET_NAME, 'Key': video.s3_key},
+            Params={'Bucket': settings.AWS_BUCKET_NAME, 'Key': video.s3_key},
             ExpiresIn=3600 
         )
         
         # 2. THE LOCALHOST FIX (Crucial for MinIO)
         # We check an env var to see if we are in 'development' mode
-        if ENVIRONMENT == "development":
+        if settings.ENVIRONMENT == "development":
             # Docker sees 'minio:9000', but browser needs 'localhost:9000'
             if "minio:9000" in url:
                 url = url.replace("minio:9000", "localhost:9000")
@@ -136,12 +130,12 @@ def get_video_url(video_id: str, db: Session = Depends(get_db)):
 
 @router.delete("/videos/{video_id}")
 async def delete_video(video_id: str, db: Session = Depends(get_db)):
-    video = db.query(models.Video).filter(models.Video.id == video_id).first()
+    video = db.query(Video).filter(Video.id == video_id).first()
     if video is None:
         raise HTTPException(status_code=404, detail="Video not found")
     try:
         client=get_s3_client()
-        client.delete_object(Bucket=BUCKET_NAME, Key=video.s3_key)
+        client.delete_object(Bucket=settings.AWS_BUCKET_NAME, Key=video.s3_key)
         db.delete(video)
         db.commit()
         return {"success": True, "message": "Video deleted successfully"}

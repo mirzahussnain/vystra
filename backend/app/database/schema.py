@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 from datetime import datetime
 from typing import List, Optional, Any
-from app.models.models import VideoStatus
+from app.database.models import VideoStatus
 
 class VideoResponse(BaseModel):
     id: str
