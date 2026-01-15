@@ -4,6 +4,7 @@ import ModeToggle  from "@/components/ui/theme-toggler";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"; // Ensure you have Avatar installed via Shadcn
 import { Bell } from "lucide-react";
+import { Breadcrumbs } from "./breadcrumbs";
 
 const Header = () => {
   return (
@@ -11,7 +12,7 @@ const Header = () => {
       
       {/* Left: Breadcrumbs or Page Title (Placeholder) */}
       <div className="font-semibold text-sm text-muted-foreground">
-        Dashboard / Overview
+        <Breadcrumbs/>
       </div>
 
       {/* Right: Actions */}

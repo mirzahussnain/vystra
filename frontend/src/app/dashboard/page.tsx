@@ -1,8 +1,14 @@
+"use client"
+
 import { VideoList } from "@/components/dashboard/video-list";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useGetVideosQuery } from "@/store/api/videoApi";
 import { Activity, Clock, FileVideo, HardDrive } from "lucide-react";
+import { useState } from "react";
 
 const DashboardPage = () => {
+  const [searchTerm,setSearchTerm]=useState('')
+  const { data:videos, isLoading, isError } =useGetVideosQuery(searchTerm,{pollingInterval:3000})
   return (
     <>
       <div className="flex flex-col md:flex-row items-center justify-between">
@@ -14,7 +20,7 @@ const DashboardPage = () => {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <StatsCard
           title="Total Videos"
-          value="12"
+          value={videos?.length}
           icon={FileVideo}
           desc="+2 from last week"
         />
@@ -42,7 +48,7 @@ const DashboardPage = () => {
       <div className="rounded-xl border border-border bg-card text-card-foreground shadow">
         <div className="p-6">
           <h3 className="font-semibold text-lg mb-3">Recent Uploads</h3>
-          <VideoList />
+          <VideoList videos={videos} isError={isError} isLoading={isLoading} />
         </div>
       </div>
     </>

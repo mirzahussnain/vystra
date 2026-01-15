@@ -33,50 +33,25 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { toast } from "sonner";
+import { useDeleteVideoMutation } from "@/store/api/videoApi";
 
-export function VideoList() {
-  const [videos, setVideos] = useState<Video[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
+interface VideoListProps{
+  videos: Video[],
+  isLoading: boolean,
+  isError: boolean,
+}
+export function VideoList({ videos, isLoading, isError }: VideoListProps) {
+  const [deleteVideo, { isLoading: isDeleting }] = useDeleteVideoMutation();
 
-  const fetchVideos = async () => {
+  const handleDelete = async (id: string) => {
     try {
-      // In a real scenario, this hits your FastAPI backend
-      // const res = await api.get("/videos/");
-      // setVideos(res.data);
-
-      // FOR NOW: Let's Mock it so you can see the UI immediately
-      // Remove this mock block once your backend is fully connected
-      setTimeout(() => {
-        setVideos([
-          {
-            id: "1",
-            title: "Quarterly_Review_Q4.mp4",
-            filename: "vid_001.mp4",
-            created_at: new Date().toISOString(),
-          },
-          {
-            id: "2",
-            title: "Steve_Jobs_Keynote.mp4",
-            filename: "vid_002.mp4",
-            created_at: new Date(Date.now() - 86400000).toISOString(),
-          },
-        ]);
-        setLoading(false);
-      }, 1000);
-    } catch (err) {
-      console.error(err);
-      setError(true);
-      setLoading(false);
+      await deleteVideo(id).unwrap();
+      toast.success("Video Deleted", {
+        description: "Video removed from your library"
+      });
+    } catch (error) {
+      toast.error("Failed to delete video");
     }
-  };
-
-  const handleDelete = (id: string) => {
-    // In real app: await api.delete(`/videos/${id}`)
-    setVideos(videos.filter((v) => v.id !== id));
-    toast.success("Video deleted", {
-      description: "The video has been removed from your library.",
-    });
   };
 
   const handleCopyId = (id: string) => {
@@ -84,11 +59,8 @@ export function VideoList() {
     toast.info("ID Copied", { description: id });
   };
 
-  useEffect(() => {
-    fetchVideos();
-  }, []);
-
-  if (loading) {
+ 
+  if (isLoading || isDeleting) {
     return (
       <div className="flex flex-col items-center justify-center h-[300px] text-muted-foreground">
         <Loader2 className="w-8 h-8 animate-spin mb-4 text-primary" />
@@ -97,19 +69,19 @@ export function VideoList() {
     );
   }
 
-  if (error) {
+  if (isError) {
     return (
       <div className="flex flex-col items-center justify-center h-[300px] text-red-500">
         <AlertCircle className="w-8 h-8 mb-4" />
         <p>Failed to load videos. Is the backend running?</p>
-        <Button variant="outline" className="mt-4" onClick={fetchVideos}>
+        <Button variant="outline" className="mt-4" >
           Retry
         </Button>
       </div>
     );
   }
 
-  if (videos.length === 0) {
+  if (videos?.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center h-[300px] border-2 border-dashed border-border rounded-xl bg-muted/10">
         <div className="p-4 rounded-full bg-muted mb-4">
@@ -130,16 +102,16 @@ export function VideoList() {
     <div className="rounded-xl border border-border bg-card shadow-sm overflow-hidden flex flex-col">
       <div className="overflow-x-auto">
         <Table>
-          <TableHeader className="bg-muted/40">
+          <TableHeader className="bg-muted/40" >
             <TableRow>
-              <TableHead className="w-[400px]">Name</TableHead>
+              <TableHead className="w-[400px] ml-2">Name</TableHead>
               <TableHead className="max-sm:hidden">Status</TableHead>
               <TableHead className="max-sm:hidden">Uploaded</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+              <TableHead className="text-center">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {videos.map((video) => (
+            {videos?.map((video) => (
               <TableRow key={video.id} className="group">
                 <TableCell className="font-medium">
                   <div className="flex items-center gap-3">
@@ -154,7 +126,7 @@ export function VideoList() {
                         {video.title}
                       </span>
                       <span className="text-xs text-muted-foreground font-mono truncate max-w-[150px] md:max-w-[300px]">
-                        {video.filename}
+                        {video.id}
                       </span>
                     </div>
                   </div>
@@ -162,9 +134,9 @@ export function VideoList() {
                 <TableCell className="max-sm:hidden">
                   <Badge
                     variant="secondary"
-                    className="bg-green-500/10 text-green-600 hover:bg-green-500/20 border-green-200 dark:border-green-900"
+                    className={`${video.status==='completed'?"bg-green-500/10 text-green-600 hover:bg-green-500/20 border-green-200 dark:border-green-900":video.status==='processing'?"bg-yellow-500/10 text-yellow-600 hover:bg-yellow-500/20 border-yellow-200 dark:border-yellow-900":video.status==='failed'&&"bg-red-500/10 text-red-600 hover:bg-red-500/20 border-red-200 dark:border-red-900"}`}
                   >
-                    Ready
+                    {video.status}
                   </Badge>
                 </TableCell>
                 <TableCell className="max-sm:hidden text-muted-foreground text-sm">
@@ -172,7 +144,7 @@ export function VideoList() {
                     <Clock className="w-3 h-3" />
                     {/* Requires: npm install date-fns */}
                     {/* {formatDistanceToNow(new Date(video.created_at), { addSuffix: true })} */}
-                    2 hours ago
+                    {formatDistanceToNow(new Date(video.created_at), { addSuffix: true })}
                   </div>
                 </TableCell>
                 {/* ACTIONS DROPDOWN */}
@@ -231,7 +203,7 @@ export function VideoList() {
       </div>
 
       <div className="border-t border-border bg-muted/20 p-4 flex items-center justify-between text-xs text-muted-foreground">
-        <span>Showing {videos.length} videos</span>
+        <span>Showing {videos?.length} videos</span>
         <div className="flex gap-2">
           <Button variant="outline" size="sm" disabled className="h-7 text-xs">
             Previous

@@ -24,4 +24,4 @@ class Video(Base):
         default=VideoStatus.PROCESSING,
         nullable=False,
     )
-    analysis = Column(JSON, nullable=True)
+    analysis = Column(JSON, nullable=True)  

@@ -12,7 +12,8 @@ class SETTINGS:
     _aws_secret_access_key = os.getenv("AWS_SECRET_ACCESS_KEY", "minioadmin")
     _aws_endpoint_url = os.getenv("AWS_ENDPOINT_URL", "http://minio:9000")
     _aws_bucket_name = os.getenv("AWS_BUCKET_NAME", "videos")
-
+    _environment = os.getenv("ENVIRONMENT")
+    
     if _database_url is None:
         raise ValueError("DATABASE_URL environment variable is not set")
 
@@ -33,8 +34,9 @@ class SETTINGS:
 
     if _allowed_origins is None:
         raise ValueError("ALLOWED_ORIGINS environment variable is not set")
-
+        
+    if _environment is None:
+        raise ValueError("ENVIRONMENT environment variable is not set")
   
-
 
 settings = SETTINGS()

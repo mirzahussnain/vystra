@@ -7,7 +7,10 @@ export const api = axios.create({
 
 export interface Video {
   id: string;
-  title: string;
-  filename: string;
-  created_at: string;
+  title: string,
+  created_at: Date,
+  description?: string,
+  status: string,
+  transcript?: string,
+  analysis?:Array<object>
 }

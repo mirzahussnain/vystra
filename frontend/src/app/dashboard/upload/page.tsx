@@ -19,7 +19,7 @@ const UploadPage = () => {
             </CardDescription>
         </CardHeader>
         <CardContent>
-            {/* The component we built earlier */}
+            {/* Drag & Drop Upload File*/}
             <UploadZone />
         </CardContent>
       </Card>
