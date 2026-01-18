@@ -1,14 +1,16 @@
 import { configureStore } from '@reduxjs/toolkit'
 import { videosApi } from '@/store/api/videoApi' // We'll create this next
+import { notificationApi } from './api/notificationApi'
 
 export const makeStore = () => {
   return configureStore({
     reducer: {
       // Add the generated reducer
       [videosApi.reducerPath]: videosApi.reducer,
+      [notificationApi.reducerPath]: notificationApi.reducer,
     },
     middleware: (getDefaultMiddleware) =>
-      getDefaultMiddleware().concat(videosApi.middleware),
+      getDefaultMiddleware().concat(videosApi.middleware).concat(notificationApi.middleware),
   })
 }
 

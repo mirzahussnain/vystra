@@ -144,6 +144,7 @@ async def delete_video(video_id: str, db: Session = Depends(get_db)):
         raise HTTPException(status_code=500, detail="Could not delete video from S3")
         
 
+
 # @router.delete("/videos/")
 # def update_video(video_id:str,title:str,db:Session=Depends(get_db)):
 #     video=db.query(models.Video).filter(models.Video.id==video_id).first()

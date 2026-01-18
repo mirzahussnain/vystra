@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker,declarative_base
 from app.core.config import settings
 
@@ -17,3 +17,11 @@ def get_db():
         yield db
     finally:
         db.close()
+        
+def create_extension():
+
+    # 3. Enable Extension
+    with engine.connect() as connection:
+        connection.execute(text("CREATE EXTENSION IF NOT EXISTS vector"))
+        connection.commit()
+        print("✅ 'vector' extension enabled.")

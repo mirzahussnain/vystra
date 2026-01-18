@@ -3,7 +3,7 @@ const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 export const videosApi = createApi({
   reducerPath: "videosApi",
   baseQuery: fetchBaseQuery({ baseUrl: API_URL }), // Make sure port matches your FastAPI
-  tagTypes: ["Video"],
+  tagTypes: ["Video", "Search"],
   endpoints: (builder) => ({
     // Get All Videos (Supports Search)
     getVideos: builder.query({
@@ -35,6 +35,18 @@ export const videosApi = createApi({
       }),
       invalidatesTags: ["Video"], // Auto-refresh the list after deletion
     }),
+    semanticSearchVideos: builder.query({
+      query: ({search, video_id}) =>  {
+        return {
+          url: '/search',
+          params: {
+            q:search,
+            video_id          }
+        }
+        
+      },
+      providesTags: (result,error,{video_id})=>[{type:"Search",id:video_id || 'GLOBAL'}],
+    }),
   }),
 });
 
@@ -44,4 +56,6 @@ export const {
   useUploadVideoMutation,
   useGetVideoUrlQuery,
   useDeleteVideoMutation,
+  useSemanticSearchVideosQuery,
+  useLazySemanticSearchVideosQuery
 } = videosApi;

@@ -6,19 +6,11 @@ import { Input } from "@/components/ui/input";
 import { Search, Play, Pause, Loader2, AlertCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Particles } from "../ui/particles";
-import {
-  useGetVideoByIdQuery,
-  useGetVideoUrlQuery,
-} from "@/store/api/videoApi";
 import React from "react";
 import { DEMO_TRANSCRIPT } from "@/constants/demo";
 import { cn } from "@/lib/utils";
 
-interface AnalysisSegment {
-  start: number;
-  end: number;
-  text: string;
-}
+
 
 const DEMO_VIDEO_URL = process.env.NEXT_PUBLIC_DEMO_VIDEO_URL || "";
 // --- 1. OPTIMIZATION: Extract Item to prevent unnecessary re-renders ---

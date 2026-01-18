@@ -32,7 +32,7 @@ const LibraryPage = () => {
     return videos.map((video) => ({
       ...video,
      
-      searchBlob: `${video.title} ${video.analysis?.map((s:any) => s.text).join(" ")}`.toLowerCase()
+      searchBlob: `${video.title} ${video.segments?.map((s:any) => s.text).join(" ")}`.toLowerCase()
     }));
   }, [videos]);
   

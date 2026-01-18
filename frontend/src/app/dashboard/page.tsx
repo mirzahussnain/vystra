@@ -8,7 +8,8 @@ import { useState } from "react";
 
 const DashboardPage = () => {
   const [searchTerm,setSearchTerm]=useState('')
-  const { data:videos, isLoading, isError } =useGetVideosQuery(searchTerm,{pollingInterval:3000})
+  const { data: videos, isLoading, isError } = useGetVideosQuery(searchTerm, { pollingInterval: 3000 })
+ 
   return (
     <>
       <div className="flex flex-col md:flex-row items-center justify-between">

@@ -1,7 +1,5 @@
 "use client";
-
-import { useEffect, useState } from "react";
-import { api, Video } from "@/lib/api";
+import {  VideoListProps } from "@/lib/types";
 import {
   Table,
   TableBody,
@@ -35,11 +33,7 @@ import {
 import { toast } from "sonner";
 import { useDeleteVideoMutation } from "@/store/api/videoApi";
 
-interface VideoListProps{
-  videos: Video[],
-  isLoading: boolean,
-  isError: boolean,
-}
+
 export function VideoList({ videos, isLoading, isError }: VideoListProps) {
   const [deleteVideo, { isLoading: isDeleting }] = useDeleteVideoMutation();
 
@@ -121,9 +115,9 @@ export function VideoList({ videos, isLoading, isError }: VideoListProps) {
                     <div className="flex flex-col min-w-0">
                       <span
                         className="font-semibold text-foreground truncate max-w-[150px] md:max-w-[300px]"
-                        title={video.title} // Tooltip shows full name on hover
+                        title={video.ai_title || video.title} // Tooltip shows full name on hover
                       >
-                        {video.title}
+                        {video.ai_title ||video.title}
                       </span>
                       <span className="text-xs text-muted-foreground font-mono truncate max-w-[150px] md:max-w-[300px]">
                         {video.id}
@@ -136,7 +130,7 @@ export function VideoList({ videos, isLoading, isError }: VideoListProps) {
                     variant="secondary"
                     className={`${video.status==='completed'?"bg-green-500/10 text-green-600 hover:bg-green-500/20 border-green-200 dark:border-green-900":video.status==='processing'?"bg-yellow-500/10 text-yellow-600 hover:bg-yellow-500/20 border-yellow-200 dark:border-yellow-900":video.status==='failed'&&"bg-red-500/10 text-red-600 hover:bg-red-500/20 border-red-200 dark:border-red-900"}`}
                   >
-                    {video.status}
+                    {video.status.replace(video.status.charAt(0),video.status.charAt(0).toUpperCase())}
                   </Badge>
                 </TableCell>
                 <TableCell className="max-sm:hidden text-muted-foreground text-sm">

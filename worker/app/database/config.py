@@ -8,9 +8,18 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
 
-def get_db():
-    db=SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+def create_tables():
+    # 1. Open a connection
+    with engine.connect() as connection:
+        # 2. Enable the extension automatically! ⚡
+        connection.execute(text("CREATE EXTENSION IF NOT EXISTS vector"))
+        connection.commit()
+        print("✅ 'vector' extension enabled.")
+
+    # 3. NOW create the tables (This will work now!)
+    Base.metadata.create_all(bind=engine)
+    print("✅ Tables created successfully.")
+
+if __name__ == "__main__":
+    create_tables()
+

@@ -8,9 +8,17 @@ import DemoSection from "@/components/landing/demo-section";
 import HowItWorks from "@/components/landing/how-it-works";
 import UseCaseMarquee from "@/components/landing/usecase-marque";
 import Footer from "@/components/landing/footer";
-import MobileNav from "@/components/landing/mobile-nav";
+import MobileNav from "@/components/global/mobile-nav";
+import { MobileNavProps } from "@/lib/types";
 
 export default function Home() {
+  const navItems: MobileNavProps[]=[
+    { label: "Home", href: "/" },
+    { label: "Features", href: "#" },
+    { label: "How it Works", href: "#" },
+    { label: "Pricing", href: "#" },
+    { label: "Docs", href: "#" },
+  ];
   return (
     <main className="flex min-h-screen flex-col bg-background">
       {/* Navbar */}
@@ -20,7 +28,7 @@ export default function Home() {
           {/* Left: Logo (Desktop) OR Mobile Menu (Mobile) */}
           <div className="flex items-center gap-4">
             {/* MOBILE NAV */}
-            <MobileNav />
+            <MobileNav navItems={navItems} type="landing" />
 
             {/* Logo Link */}
             <Link href="/" className="flex items-center gap-2">
