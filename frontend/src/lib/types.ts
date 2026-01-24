@@ -1,3 +1,5 @@
+export type PlanId = "free" | "pro" | "enterprise";
+
 export interface Video {
   id: string;
   title: string,

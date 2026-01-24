@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import {
   CheckCircle2,
   ArrowLeft,
@@ -28,6 +28,7 @@ import { TranscriptView } from "@/components/dashboard/transcript-view";
 import { AIInsights } from "@/components/dashboard/ai-insights";
 import { useGetVideoByIdQuery, useGetVideoUrlQuery } from "@/store/api/videoApi";
 import { toast } from "sonner";
+import ErrorDisplayer from "@/components/global/error-displayer";
 
 export default function VideoAnalysisPage() {
   const { id } = useParams();
@@ -100,6 +101,9 @@ export default function VideoAnalysisPage() {
     }
   };
 
+  
+  
+
   // --- LOADING / ERROR STATES ---
   if (isMetaLoading || isUrlLoading) {
     return (
@@ -108,6 +112,8 @@ export default function VideoAnalysisPage() {
       </div>
     );
   }
+   
+  if(metaError || urlError) return (<ErrorDisplayer error={`${metaError.data?.detail || urlError?.data?.detail}`}/>)
 
   if (!metaData || !streamData?.url) {
     return (
@@ -206,8 +212,9 @@ export default function VideoAnalysisPage() {
               ref={videoRef}
               className="w-full h-full object-contain"
               controls
+              controlsList={"nodownload"}
               onTimeUpdate={handleTimeUpdate}
-              src={streamData.url}
+              src={streamData?.url}
             />
           </div>
 
@@ -240,7 +247,7 @@ export default function VideoAnalysisPage() {
             currentTime={currentTime}
             onSeek={handleSeek}
             segments={metaData.segments || []} // Use analysis field for transcript segments
-            video_Id={metaData.video_id}
+            video_Id={metaData.id}
           />
         </div>
 

@@ -7,12 +7,11 @@ import { useUploadVideoMutation } from "@/store/api/videoApi"; // <--- NEW IMPOR
 import { toast } from "sonner";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
+import { useVideoUpload } from "@/hooks/upload-video";
 
 const UploadZone = () => {
  
-  const [uploadVideo, { isLoading }] = useUploadVideoMutation();
-  
-  const [progress, setProgress] = useState(0);
+  const { uploadVideo, progress, isUploading } = useVideoUpload();
   const [file, setFile] = useState<File | null>(null);
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
@@ -25,36 +24,14 @@ const UploadZone = () => {
     onDrop,
     accept: { "video/*": [".mp4"] },
     maxFiles: 1,
-    disabled: isLoading, // Disable dropzone while uploading
+    disabled: isUploading, // Disable dropzone while uploading
   });
 
   const handleUpload = async () => {
     if (!file) return;
 
-    // Fake progress for UI feel (RTK Query doesn't expose progress % easily yet)
-    setProgress(10);
-    const interval = setInterval(() => {
-      setProgress((prev) => (prev >= 90 ? 90 : prev + 10));
-    }, 500);
-
-    const formData = new FormData();
-    formData.append("file", file);
-
-    try {
-      // 2. Call the mutation
-      await uploadVideo(formData).unwrap();
-
-      clearInterval(interval);
-      setProgress(100);
-      toast.success("Upload complete! Processing started.");
-      setFile(null); // Reset UI
-      
-    } catch (error) {
-      console.error(error);
-      clearInterval(interval);
-      toast.error("Upload failed. Is the backend running?");
-      setProgress(0);
-    } 
+      await uploadVideo(file);
+      setFile(null); 
   };
 
   return (
@@ -66,13 +43,13 @@ const UploadZone = () => {
           className={`
             border-2 border-dashed rounded-xl p-10 text-center cursor-pointer transition-all
             ${isDragActive ? "border-primary bg-primary/10" : "border-border hover:border-primary/50 hover:bg-muted/50"}
-            ${isLoading ? "opacity-50 pointer-events-none" : ""}
+            ${isUploading ? "opacity-50 pointer-events-none" : ""}
           `}
         >
           <input {...getInputProps()} />
           <div className="flex flex-col items-center gap-4">
             <div className="p-4 rounded-full bg-secondary">
-              {isLoading ? (
+              {isUploading ? (
                  <Loader2 className="w-10 h-10 text-primary animate-spin" />
               ) : (
                  <UploadCloud className="w-10 h-10 text-primary" />
@@ -80,7 +57,7 @@ const UploadZone = () => {
             </div>
             <div>
               <p className="text-lg font-medium">
-                {isLoading ? "Uploading to server..." : "Click to upload or drag and drop"}
+                {isUploading ? "Uploading to server..." : "Click to upload or drag and drop"}
               </p>
               <p className="text-sm text-muted-foreground mt-1">
                 MP4 (Max 500MB)
@@ -97,28 +74,28 @@ const UploadZone = () => {
                 <FileVideo className="w-6 h-6 text-primary" />
               </div>
               <div className="text-left">
-                <p className="font-medium truncate max-w-[200px]">{file.name}</p>
+                <p className="font-medium truncate max-w-[200px] max-sm:max-w-[150px]">{file.name}</p>
                 <p className="text-xs text-muted-foreground">
                   {(file.size / (1024 * 1024)).toFixed(2)} MB
                 </p>
               </div>
             </div>
             
-            {!isLoading && (
+            {!isUploading && (
                 <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); setFile(null); }}>
                     <X className="w-5 h-5" />
                 </Button>
             )}
           </div>
 
-          {isLoading && (
+          {isUploading && (
             <div className="space-y-2">
               <Progress value={progress} className="h-2" />
               <p className="text-xs text-muted-foreground text-center">Uploading... {progress}%</p>
             </div>
           )}
 
-          {!isLoading && (
+          {!isUploading && (
             <Button className="w-full mt-4" onClick={handleUpload}>
               Upload Video
             </Button>

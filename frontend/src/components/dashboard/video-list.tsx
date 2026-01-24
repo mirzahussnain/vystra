@@ -32,6 +32,7 @@ import {
 } from "../ui/dropdown-menu";
 import { toast } from "sonner";
 import { useDeleteVideoMutation } from "@/store/api/videoApi";
+import ErrorDisplayer from "../global/error-displayer";
 
 
 export function VideoList({ videos, isLoading, isError }: VideoListProps) {
@@ -64,15 +65,7 @@ export function VideoList({ videos, isLoading, isError }: VideoListProps) {
   }
 
   if (isError) {
-    return (
-      <div className="flex flex-col items-center justify-center h-[300px] text-red-500">
-        <AlertCircle className="w-8 h-8 mb-4" />
-        <p>Failed to load videos. Is the backend running?</p>
-        <Button variant="outline" className="mt-4" >
-          Retry
-        </Button>
-      </div>
-    );
+    <ErrorDisplayer error="Failed to load videos."/>
   }
 
   if (videos?.length === 0) {

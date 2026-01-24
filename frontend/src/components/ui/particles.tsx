@@ -18,8 +18,8 @@ export const Particles = ({ className = "" }: { className?: string }) => {
     id: i,
     x: Math.random() * 100, // Random % position
     y: Math.random() * 100,
-    size: Math.random() * 4 + 1, // Random size 1px-5px
-    duration: Math.random() * 20 + 10, // Random speed 10s-30s
+    size: Math.random() * 8 + 1, // Random size 1px-5px
+    duration: Math.random() * 15 + 10, // Random speed 10s-30s
     delay: Math.random() * 5,
   }));
 

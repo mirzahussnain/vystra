@@ -1,15 +1,80 @@
-"use client"
+"use client";
 
 import { VideoList } from "@/components/dashboard/video-list";
+import ErrorDisplayer from "@/components/global/error-displayer";
+import Loader from "@/components/global/loader";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useGetVideosQuery } from "@/store/api/videoApi";
+import { formatBytes, formatDuration } from "@/lib/utils";
+import {
+  useGetDashboardStatsQuery,
+  useGetVideosQuery,
+  useLazyGetVideosQuery,
+} from "@/store/api/videoApi";
+import { useAuth, useUser } from "@clerk/nextjs";
 import { Activity, Clock, FileVideo, HardDrive } from "lucide-react";
-import { useState } from "react";
+import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 const DashboardPage = () => {
-  const [searchTerm,setSearchTerm]=useState('')
-  const { data: videos, isLoading, isError } = useGetVideosQuery(searchTerm, { pollingInterval: 3000 })
- 
+  const [searchTerm, setSearchTerm] = useState("");
+  const pathname = usePathname();
+  const { user, isLoaded: userLoaded, isSignedIn } = useUser();
+  const [pollingInterval, setPollingInterval] = useState(0);
+  const {
+    data: stats,
+    isLoading: statsLoading,
+    isError: statsError,
+    error: stats_error,
+  } = useGetDashboardStatsQuery(undefined, {
+    pollingInterval: pollingInterval,
+  });
+  const {
+    data: videos,
+    isLoading: videosLoading,
+    isError: videoError,
+    error,
+  } = useGetVideosQuery(
+    { search: searchTerm },
+    {
+      pollingInterval: pollingInterval,
+    },
+    );
+  
+  useEffect(() => {
+    if (pathname.includes('sucess')) {
+      toast.success('Plan Successfully, updated.')
+    }
+  },[pathname])
+
+  useEffect(() => {
+    if (videos) {
+      const hasActiveJobs = videos.some(
+        (video: any) =>
+          video.status === "processing" || video.status === "uploading",
+      );
+
+      // If active jobs exist, set interval to 3000ms, otherwise 0ms
+      setPollingInterval(hasActiveJobs ? 3000 : 0);
+    }
+  }, [videos]);
+
+  if (!userLoaded || videosLoading || statsLoading) {
+    return <Loader text="Loading Dashboard" />;
+  }
+  if (videoError || statsError) {
+    return (
+      <ErrorDisplayer
+        error={`Failed to fetch videos for user: ${error?.data?.detail || stats_error?.data?.detail}`}
+      />
+    );
+  }
+
+  
+
+  // "Hours Saved" Logic: Assuming summarizing takes 2x the video length manually
+  const hoursSaved = (((stats?.total_minutes || 0) * 2) / 60).toFixed(1);
+  
   return (
     <>
       <div className="flex flex-col md:flex-row items-center justify-between">
@@ -21,27 +86,28 @@ const DashboardPage = () => {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <StatsCard
           title="Total Videos"
-          value={videos?.length}
+          value={`${stats?.total_videos || 0}`}
           icon={FileVideo}
-          desc="+2 from last week"
+          desc={`+${stats?.recent_videos || 0} from last week`}
         />
         <StatsCard
           title="Minutes Processed"
-          value="245"
+          value={`${stats?.minutes_used || 0}`}
           icon={Clock}
-          desc="1.2 hours saved"
+          desc={`${Math.round(stats?.minutes_percent || 0)}% of ${formatDuration(stats?.minutes_limit || 0)} limit`}
+          
         />
         <StatsCard
           title="Storage Used"
-          value="1.2 GB"
+          value={`${formatBytes(stats.storage_used || 0)}`}
           icon={HardDrive}
-          desc="12% of 10GB limit"
+          desc={`${stats.storage_percent}% of ${formatBytes(stats.storage_limit)} limit`}
         />
         <StatsCard
-          title="API Requests"
-          value="450"
+          title="AI Actions"
+          value={`${stats?.ai_score} / ${stats?.ai_limit}`}
           icon={Activity}
-          desc="+12% activity"
+          desc={`Monthly Quota`}
         />
       </div>
 
@@ -49,7 +115,11 @@ const DashboardPage = () => {
       <div className="rounded-xl border border-border bg-card text-card-foreground shadow">
         <div className="p-6">
           <h3 className="font-semibold text-lg mb-3">Recent Uploads</h3>
-          <VideoList videos={videos} isError={isError} isLoading={isLoading} />
+          <VideoList
+            videos={videos}
+            isError={videoError}
+            isLoading={videosLoading}
+          />
         </div>
       </div>
     </>

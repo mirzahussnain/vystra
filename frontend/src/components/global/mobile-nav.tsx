@@ -12,6 +12,7 @@ import Link from "next/link";
 import Logo from "@/components/ui/logo";
 import { useState } from "react";
 import { MobileNavProps } from "@/lib/types";
+import { LogoV } from "../ui/logo-vystra";
 
 const MobileNav = ({
   navItems,
@@ -38,10 +39,10 @@ const MobileNav = ({
         <SheetTitle className="sr-only">Mobile Navigation</SheetTitle>{" "}
         {/* Accessibility Fix */}
        
-          <div className="flex flex-col justify-center items-center gap-2 px-2 mb-8 mt-3">
-            <Logo className="w-10 h-10 text-primary" />
-            <span className="font-bold text-lg tracking-tight">
-              Insight<span className="text-primary">Stream</span>
+          <div className="flex flex-col justify-center items-center gap-2 px-2 mb-8 mt-3 relative">
+            <LogoV className="w-24" />
+            <span className="font-bold text-lg tracking-tight absolute  translate-y-10 translate-x-2">
+              Vy<span className="text-primary">stra</span>
             </span>
           </div>
       

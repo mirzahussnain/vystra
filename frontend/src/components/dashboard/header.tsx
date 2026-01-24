@@ -10,10 +10,20 @@ import NotificationBell from "./bell-icon";
 import Logo from "../ui/logo";
 import MobileNav from "../global/mobile-nav";
 import { MobileNavProps } from "@/lib/types";
+import { useUser,useAuth } from "@clerk/nextjs";
+import { useEffect, useState } from "react";
 
 
 const Header = () => {
-  const { data: notifications, isLoading: notificationsLoading } = useGetNotificationsQuery(undefined,{ pollingInterval: 3000 })
+  const { user,isLoaded:userLoaded, isSignedIn } = useUser();
+  const { getToken, isLoaded: authLoaded ,sessionId} = useAuth();
+  const [token, setToken] = useState<string | null>(null);
+  const { data: notifications, isLoading: notificationsLoading } = useGetNotificationsQuery(undefined, {
+    pollingInterval: 3000,
+    skip: !userLoaded || !authLoaded || !sessionId || !isSignedIn
+  });
+  
+
   const navItems: MobileNavProps[] = [
     {label:"Home", href:"/"},
     { label: "Overview", href: "/dashboard" },
@@ -21,7 +31,8 @@ const Header = () => {
     { label: "Settings", href: "/dashboard/settings" },
     { label: "Logout", href: "/logout" },
   ];
- 
+  
+
   return (
     <header className="h-16 border-b border-border bg-background/50 backdrop-blur-xl flex items-center justify-between px-6 sticky top-0 z-10">
       
@@ -55,7 +66,7 @@ const Header = () => {
 
         <div className="flex items-center gap-3">
             <div className="text-right hidden sm:block">
-                <p className="text-sm font-medium leading-none">John Developer</p>
+                <p className="text-sm font-medium leading-none">{user?.firstName} {user?.lastName}</p>
                 <p className="text-xs text-muted-foreground">Pro Plan</p>
             </div>
             <Avatar className="h-9 w-9 border border-border">

@@ -1,9 +1,7 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
-export const notificationApi = createApi({
-  reducerPath: "notificationApi",
-  baseQuery: fetchBaseQuery({ baseUrl: API_URL }),
-  tagTypes: ["Notification"],
+
+import { apiSlice } from "../apiSlice";
+
+export const notificationApi =apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     markAllAsRead: builder.mutation({
       query: () => ({
@@ -13,7 +11,7 @@ export const notificationApi = createApi({
       invalidatesTags: ["Notification"],
     }),
     getNotifications: builder.query({
-      query: () => ("/notifications"),
+      query: () => "/notifications",
       providesTags: ["Notification"],
     }),
     createNotification: builder.mutation({
@@ -34,11 +32,17 @@ export const notificationApi = createApi({
     markNotificationAsRead: builder.mutation({
       query: (id) => ({
         url: `/notifications/${id}/read`,
-        method:"PATCH"
+        method: "PATCH",
       }),
       invalidatesTags: ["Notification"],
     }),
   }),
 });
 
-export const { useMarkAllAsReadMutation, useGetNotificationsQuery, useCreateNotificationMutation, useDeleteNotificationMutation, useMarkNotificationAsReadMutation } = notificationApi;
+export const {
+  useMarkAllAsReadMutation,
+  useGetNotificationsQuery,
+  useCreateNotificationMutation,
+  useDeleteNotificationMutation,
+  useMarkNotificationAsReadMutation,
+} = notificationApi;

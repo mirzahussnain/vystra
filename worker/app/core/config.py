@@ -6,6 +6,7 @@ class Settings:
     PROJECT_VERSION: str = "1.0.0"
 
     _redis_url = os.getenv("REDIS_URL", "redis://redis:6379/0")
+    _enviroment=os.getenv("ENVIRONMENT","development")
     _database_url=os.getenv("DATABASE_URL")
     _aws_access_key_id = os.getenv("AWS_ACCESS_KEY_ID", "minioadmin")
     _aws_secret_access_key = os.getenv("AWS_SECRET_ACCESS_KEY", "minioadmin")
@@ -15,6 +16,8 @@ class Settings:
 
     if _redis_url is None:
         raise ValueError("REDIS_URL is not set in .env file")
+    if _enviroment is None:
+        raise ValueError("ENVIRONMENT is not set in .env file")
     if _aws_access_key_id is None:
         raise ValueError("AWS_ACCESS_KEY_ID is not set in .env file")
     if _aws_secret_access_key is None:
@@ -42,5 +45,6 @@ class Settings:
 
     # Grok API
     GROQ_API_KEY: str = _groq_api_key
+    ENVIRONMENT: str = _enviroment
 
 settings = Settings()

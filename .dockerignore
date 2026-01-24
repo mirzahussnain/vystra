@@ -1,0 +1,29 @@
+# 1. Ignore GIT (Huge)
+.git
+.gitignore
+
+# 2. Ignore Frontend (Massive node_modules)
+# We don't need frontend code to build the Python Backend/Worker
+frontend/
+node_modules/
+.next/
+
+# 3. Ignore Virtual Envs
+venv/
+env/
+insightstream-venv/
+
+# 4. Ignore Temp Files & Cache
+__pycache__
+*.pyc
+*.pyo
+.pytest_cache
+.coverage
+.env
+.DS_Store
+
+# 5. Ignore Media/Storage (Don't send videos to the build context)
+*.mp4
+*.mp3
+minio_data/
+postgres_data/

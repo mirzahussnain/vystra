@@ -88,7 +88,7 @@ const NotificationBell = ({ notifications = [] }: NotificationBellProps) => {
         </Button>
       </PopoverTrigger>
 
-      <PopoverContent className="w-97 p-0" align="end">
+      <PopoverContent className="w-97 max-sm:w-72 p-0" align="end">
         <div className="p-4 border-b font-semibold bg-glass flex justify-between items-center">
           <span>Notifications</span>
           {hasUnread && (
@@ -100,7 +100,7 @@ const NotificationBell = ({ notifications = [] }: NotificationBellProps) => {
           )}
         </div>
 
-        <div className="max-h-[300px] overflow-y-auto rounded-b-xl">
+        <div className="max-h-[300px] overflow-auto rounded-b-xl">
           {notifications.length === 0 ? (
             <div className="p-8 text-center text-gray-500 text-sm">
               No notifications
@@ -110,7 +110,7 @@ const NotificationBell = ({ notifications = [] }: NotificationBellProps) => {
               <div
                 onClick={()=>handleNotificationClick(n)}
                 key={n.id}
-                className={`py-3 px-2 w-full  border-t-2 border-border text-sm cursor-pointer hover:bg-border flex gap-3 items-start transition-colors ${getBgColor(n.type, n.is_read)}`}
+                className={`py-3 px-4 w-fit overflow-x-auto border-t-2 border-border text-sm cursor-pointer hover:bg-border flex gap-3 items-start transition-colors ${getBgColor(n.type, n.is_read)}`}
               >
                 <div className="mt-0.5 shrink-0">{getIcon(n.type)}</div>
                 <div className="flex-1">

@@ -2,12 +2,34 @@
 
 import Sidebar  from "@/components/dashboard/sidebar";
 import Header  from "@/components/dashboard/header";
+import { useAuth } from "@clerk/nextjs";
+import Loader from "@/components/global/loader";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+
 
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
-}) {
+  }) {
+  const { isLoaded: authLoaded, isSignedIn, sessionId, userId } = useAuth();
+  const router = useRouter();
+ 
+  
+  
+  useEffect(() => {
+      // If auth finishes loading and there is no user, kick them out
+      if (authLoaded && !userId) {
+        router.push("/sign-in");
+      }
+    }, [authLoaded, userId, router]);
+  
+  
+  if (!authLoaded && !sessionId) {
+    return <Loader text="Waiting for Session Verification...." />
+  }
+  
   return (
     <div className="flex h-screen bg-muted/20 overflow-hidden">
       {/* 1. Fixed Sidebar */}
