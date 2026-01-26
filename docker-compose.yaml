@@ -7,45 +7,73 @@ services:
       - "6379:6379"
   # 2. The Database (The Warehouse)
   db:
-    image: postgres:15-alpine
+    image: pgvector/pgvector:pg15
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
     volumes:
-      - ./postgres_data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
   # 3. The API Gateway (The Receptionist)
   backend:
-    build: ./backend
+    build: 
+      context: .            
+      dockerfile: backend/Dockerfile
     ports:
       - "8000:8000"
     volumes:
-      - ./backend:/app
+      - ./backend/app:/app/backend/app
     environment:
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS}
+      - ADMIN_SECRET_KEY=${ADMIN_SECRET_KEY}
+      - CLERK_ISSUER=${CLERK_ISSUER}
+      - CLERK_WEBHOOK_SECRET=${CLERK_WEBHOOK_SECRET}
+      - STRIPE_WEBHOOK_KEY=${STRIPE_WEBHOOK_KEY}
+      - STRIPE_API_KEY=${STRIPE_API_KEY}
+      - STRIPE_PRO_PRICE_ID=${STRIPE_PRO_PRICE_ID}
+      - STRIPE_ENT_PRICE_ID=${STRIPE_ENT_PRICE_ID}
+      - FRONTEND_URL=${FRONTEND_URL}
       - REDIS_URL=${REDIS_URL}
+      - ENVIRONMENT=${ENVIRONMENT}
       - DATABASE_URL=${DATABASE_URL}
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
       - AWS_ENDPOINT_URL=${AWS_ENDPOINT_URL}
       - AWS_BUCKET_NAME=${AWS_BUCKET_NAME}
+      - PYTHONPATH=/app
     depends_on:
       - redis
       - db
 
   # 4. The AI Worker (The Factory)
   worker:
-    build: ./worker
+    build: 
+      context: .              
+      dockerfile: worker/Dockerfile
     volumes:
-      - ./worker:/app
+      - ./worker/app:/app/worker/app 
+      - ./backend/app:/app/backend/app
     environment:
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS}
+      - STRIPE_WEBHOOK_KEY=${STRIPE_WEBHOOK_KEY}
+      - STRIPE_API_KEY=${STRIPE_API_KEY}
+      - STRIPE_PRO_PRICE_ID=${STRIPE_PRO_PRICE_ID}
+      - STRIPE_ENT_PRICE_ID=${STRIPE_ENT_PRICE_ID}
+      - FRONTEND_URL=${FRONTEND_URL}
       - REDIS_URL=${REDIS_URL}
+      - GROQ_API_KEY=${GROQ_API_KEY}
       - DATABASE_URL=${DATABASE_URL}
+      - ADMIN_SECRET_KEY=${ADMIN_SECRET_KEY}
+      - CLERK_ISSUER=${CLERK_ISSUER}
+      - CLERK_WEBHOOK_SECRET=${CLERK_WEBHOOK_SECRET}
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
       - AWS_ENDPOINT_URL=${AWS_ENDPOINT_URL}
       - AWS_BUCKET_NAME=${AWS_BUCKET_NAME}
+      - ENVIRONMENT=${ENVIRONMENT}
+      - PYTHONPATH=/app
       - OMP_NUM_THREADS=1 # Prevents CPU thrashing
       - MKL_NUM_THREADS=1 # Keeps math operations stable
     depends_on:
@@ -61,5 +89,8 @@ services:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
     volumes:
-      - ./minio_data:/data
+      - minio_data:/data
     command: server /data --console-address ":9001"
+volumes:
+  postgres_data:
+  minio_data:

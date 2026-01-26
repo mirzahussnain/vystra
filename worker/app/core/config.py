@@ -6,14 +6,18 @@ class Settings:
     PROJECT_VERSION: str = "1.0.0"
 
     _redis_url = os.getenv("REDIS_URL", "redis://redis:6379/0")
+    _enviroment=os.getenv("ENVIRONMENT","development")
     _database_url=os.getenv("DATABASE_URL")
     _aws_access_key_id = os.getenv("AWS_ACCESS_KEY_ID", "minioadmin")
     _aws_secret_access_key = os.getenv("AWS_SECRET_ACCESS_KEY", "minioadmin")
     _aws_endpoint_url = os.getenv("AWS_ENDPOINT_URL", "http://minio:9000")
     _bucket_name = os.getenv("AWS_BUCKET_NAME", "videos")
+    _groq_api_key=os.getenv("GROQ_API_KEY")
 
     if _redis_url is None:
         raise ValueError("REDIS_URL is not set in .env file")
+    if _enviroment is None:
+        raise ValueError("ENVIRONMENT is not set in .env file")
     if _aws_access_key_id is None:
         raise ValueError("AWS_ACCESS_KEY_ID is not set in .env file")
     if _aws_secret_access_key is None:
@@ -22,6 +26,10 @@ class Settings:
         raise ValueError("AWS_ENDPOINT_URL is not set in .env file")
     if _bucket_name is None:
         raise ValueError("AWS_BUCKET_NAME is not set in .env file")
+    if _groq_api_key is None:
+        raise ValueError("GROQ_API_KEY is not set in .env file")
+    if _database_url is None:
+        raise ValueError("DATABASE_URL is not set in .env file")
 
     # Redis
     REDIS_URL: str = _redis_url
@@ -32,5 +40,11 @@ class Settings:
     AWS_ENDPOINT_URL: str = _aws_endpoint_url
     AWS_BUCKET_NAME: str = _bucket_name
 
+    # Database
+    DATABASE_URL: str = _database_url
+
+    # Grok API
+    GROQ_API_KEY: str = _groq_api_key
+    ENVIRONMENT: str = _enviroment
 
 settings = Settings()
