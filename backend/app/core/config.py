@@ -14,6 +14,7 @@ class SETTINGS:
     _clerk_issuer=os.getenv("CLERK_ISSUER")
     _database_url = str(os.getenv("DATABASE_URL"))
     _redis_url = os.getenv("REDIS_URL", "redis://redis:6379/0")
+    _broker_url = os.getenv("BROKER_URL", "redis://redis:6379/0")
     _aws_access_key_id = os.getenv("AWS_ACCESS_KEY_ID", "minioadmin")
     _aws_secret_access_key = os.getenv("AWS_SECRET_ACCESS_KEY", "minioadmin")
     _aws_endpoint_url = os.getenv("AWS_ENDPOINT_URL", "http://minio:9000")
@@ -37,6 +38,8 @@ class SETTINGS:
         raise ValueError("CLERK_WEBHOOK_SECRET environment variable is not set")
     if _redis_url is None:
         raise ValueError("REDIS_URL environment variable is not set")
+    if _broker_url is None:
+        raise ValueError("BROKER_URL environment variable is not set")
 
     if _aws_access_key_id is None:
         raise ValueError("AWS_ACCESS_KEY_ID environment variable is not set")
@@ -97,6 +100,7 @@ class SETTINGS:
     DATABASE_URL = _database_url
     ADMIN_SECRET_KEY = _admin_secret_key
     REDIS_URL = _redis_url
+    BROKER_URL = _broker_url
     STRIPE_API_KEY = _stripe_api_key
     STRIPE_PRICES={
         "pro":_pro_price_id,
