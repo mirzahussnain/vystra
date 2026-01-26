@@ -1,8 +1,20 @@
-import os
 
+
+import ssl
 from celery.schedules import crontab
 from .services.celery_client import celery_app
+from .core.config import settings
 
+
+if settings.REDIS_URL and settings.REDIS_URL.startswith("rediss://"):
+    celery_app.conf.update(
+        broker_use_ssl={
+            "ssl_cert_reqs": ssl.CERT_NONE
+        },
+        redis_backend_use_ssl={
+            "ssl_cert_reqs": ssl.CERT_NONE
+        }
+    )
 celery_app.conf.update(
     imports=["worker.app.tasks.billing", "worker.app.tasks.video_processing"],
     # Prevents the worker from grabbing 4 videos at once and running out of RAM.

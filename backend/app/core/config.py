@@ -21,6 +21,7 @@ class SETTINGS:
     _environment = os.getenv("ENVIRONMENT")
     _frontend_url = os.getenv("FRONTEND_URL", "http://localhost:3000")
     _clerk_webhook_secret=os.getenv("CLERK_WEBHOOK_SECRET")
+    _r2_public_url=os.getenv("R2_PUBLIC_URL")
     if _database_url is None:
         raise ValueError("DATABASE_URL environment variable is not set")
         
@@ -48,6 +49,9 @@ class SETTINGS:
 
     if _aws_bucket_name is None:
         raise ValueError("AWS_BUCKET_NAME environment variable is not set")
+
+    if _r2_public_url is None:
+        raise ValueError("R2_PUBLIC_URL environment variable is not set")
 
     if _allowed_origins is None:
         raise ValueError("ALLOWED_ORIGINS environment variable is not set")
@@ -86,6 +90,7 @@ class SETTINGS:
     AWS_SECRET_ACCESS_KEY = _aws_secret_access_key
     AWS_ENDPOINT_URL = _aws_endpoint_url
     AWS_BUCKET_NAME = _aws_bucket_name
+    R2_PUBLIC_URL = _r2_public_url
     ENVIRONMENT = _environment
     ALLOWED_ORIGINS = _allowed_origins
     CLERK_ISSUER = _clerk_issuer
