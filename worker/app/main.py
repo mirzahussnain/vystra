@@ -1,20 +1,22 @@
-
-
 import ssl
+
 from celery.schedules import crontab
-from .services.celery_client import celery_app
+
 from .core.config import settings
+from .services.celery_client import celery_app
 
+broker_url = settings.BROKER_URL
+backend_url = settings.REDIS_URL
 
-if settings.REDIS_URL and settings.REDIS_URL.startswith("rediss://"):
-    celery_app.conf.update(
-        broker_use_ssl={
-            "ssl_cert_reqs": ssl.CERT_NONE
-        },
-        redis_backend_use_ssl={
-            "ssl_cert_reqs": ssl.CERT_NONE
-        }
-    )
+if broker_url.startswith("amqps://"):
+    # RabbitMQ just needs a boolean for SSL in most cloud setups
+    celery_app.conf.broker_use_ssl = True
+
+# 🧠 Redis (Result Backend) SSL Setup
+if backend_url.startswith("rediss://"):
+    # Redis still needs the specific CERT_NONE flag for Upstash
+    celery_app.conf.redis_backend_use_ssl = {"ssl_cert_reqs": ssl.CERT_NONE}
+
 celery_app.conf.update(
     imports=["worker.app.tasks.billing", "worker.app.tasks.video_processing"],
     # Prevents the worker from grabbing 4 videos at once and running out of RAM.
@@ -26,6 +28,10 @@ celery_app.conf.update(
     task_time_limit=300 * 60,  # Hard limit: 5 hours (AI is slow)
     # If the worker crashes mid-task, the job is not lost; Redis sends it to another worker.
     task_acks_late=True,
+    worker_enable_remote_control=False,
+    worker_mingle=False,
+    worker_gossip=False,
+    broker_heartbeat=120,
     beat_schedule={
         "reset-quotas-daily": {
             "task": "reset_monthly_quotas",
