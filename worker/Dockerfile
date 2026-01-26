@@ -23,5 +23,5 @@ COPY worker/app /app/worker/app
 
 ENV PYTHONPATH=/app
 
-# CMD ["celery", "-A", "worker.app.main.celery_app", "worker", "--pool=solo", "--concurrency=1", "--loglevel=info", "--beat"]
-CMD ["celery", "-A", "worker.app.main.celery_app", "worker", "--pool=solo", "--concurrency=1", "--loglevel=info", "--without-gossip", "--without-mingle", "--heartbeat-interval=120"]
+CMD ["celery", "-A", "worker.app.main.celery_app", "worker", "--pool=solo", "--concurrency=1", "--loglevel=info", "--beat"]
+# CMD ["celery", "-A", "worker.app.main.celery_app", "worker", "--pool=solo", "--concurrency=1", "--loglevel=info", "--without-gossip", "--without-mingle", "--heartbeat-interval=120"]
