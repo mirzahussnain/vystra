@@ -6,6 +6,7 @@ class Settings:
     PROJECT_VERSION: str = "1.0.0"
 
     _redis_url = os.getenv("REDIS_URL", "redis://redis:6379/0")
+    _broker_url = os.getenv("BROKER_URL", "redis://redis:6379/0")
     _enviroment=os.getenv("ENVIRONMENT","development")
     _database_url=os.getenv("DATABASE_URL")
     _aws_access_key_id = os.getenv("AWS_ACCESS_KEY_ID", "minioadmin")
@@ -17,6 +18,8 @@ class Settings:
 
     if _redis_url is None:
         raise ValueError("REDIS_URL is not set in .env file")
+    if _broker_url is None:
+        raise ValueError("BROKER_URL is not set in .env file")
     if _enviroment is None:
         raise ValueError("ENVIRONMENT is not set in .env file")
     if _aws_access_key_id is None:
@@ -36,6 +39,7 @@ class Settings:
 
     # Redis
     REDIS_URL: str = _redis_url
+    BROKER_URL: str = _broker_url
 
     # AWS
     AWS_ACCESS_KEY_ID: str = _aws_access_key_id
