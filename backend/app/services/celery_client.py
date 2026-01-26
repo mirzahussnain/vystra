@@ -6,7 +6,7 @@ from ..core.config import settings
 
 # Initialize the "Sender"
 celery_client = Celery(
-    "insightstream_sender",
+    "vystra_sender",
     broker=settings.REDIS_URL,
     backend=settings.REDIS_URL
 )
