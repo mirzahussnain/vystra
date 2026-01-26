@@ -30,6 +30,7 @@ import { useGetVideoByIdQuery, useGetVideoUrlQuery } from "@/store/api/videoApi"
 import { toast } from "sonner";
 import ErrorDisplayer from "@/components/global/error-displayer";
 import { FailedVideoState } from "@/components/dashboard/failed-video-status";
+import { RTQApiError } from "@/lib/types";
 
 export default function VideoAnalysisPage() {
   const { id } = useParams();
@@ -71,7 +72,7 @@ export default function VideoAnalysisPage() {
     document.body.removeChild(a);
   };
 
-  const handleExportJSON = (segments: any[]) => {
+  const handleExportJSON = (segments: {start: number, end: number, text: string}[]) => {
     if (!segments?.length) {
       toast.error("No segments to export");
       return;
@@ -80,7 +81,7 @@ export default function VideoAnalysisPage() {
     downloadFile(content, "json");
   };
 
-  const handleExportText = (segments: any[]) => {
+  const handleExportText = (segments: {start: number, end: number, text: string}[]) => {
     if (!segments?.length) {
       toast.error("No segments to export");
       return;
@@ -120,7 +121,7 @@ export default function VideoAnalysisPage() {
     );
   }
    
-  if (metaError || urlError) return (<ErrorDisplayer error={`${metaError.data?.detail || urlError?.data?.detail}`} />)
+  if (metaError || urlError) return (<ErrorDisplayer error={`${(metaError as RTQApiError)?.data?.detail || (urlError as RTQApiError)?.data?.detail}`} />)
   
   if (metaData?.status === 'failed') {
       return <FailedVideoState reason={metaData?.processing_error} id={metaData?.id} />;

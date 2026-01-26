@@ -4,6 +4,7 @@ import { VideoList } from "@/components/dashboard/video-list";
 import ErrorDisplayer from "@/components/global/error-displayer";
 import Loader from "@/components/global/loader";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { RTQApiError, Video } from "@/lib/types";
 import { formatBytes, formatDuration } from "@/lib/utils";
 import {
   useGetDashboardStatsQuery,
@@ -42,7 +43,7 @@ const DashboardPage = () => {
   useEffect(() => {
     if (videos) {
       const hasActiveJobs = videos.some(
-        (video: any) =>
+        (video: Video) =>
           video.status === "processing" || video.status === "uploading",
       );
 
@@ -61,8 +62,8 @@ const DashboardPage = () => {
   }
 
   const errorMessage =
-    (video_error as any)?.data?.details ||
-    (stats_error as any)?.data?.details ||
+    (video_error as RTQApiError)?.data?.detail ||
+    (stats_error as RTQApiError)?.data?.detail ||
    
     "An unexpected error occurred";
 
@@ -125,7 +126,7 @@ const DashboardPage = () => {
   );
 };
 
-function StatsCard({ title, value, icon: Icon, desc }: any) {
+function StatsCard({ title, value, icon: Icon, desc }: { title: string, value: string, icon: React.FC<React.SVGProps<SVGSVGElement>>, desc: string }) {
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">

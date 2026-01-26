@@ -119,7 +119,7 @@ export const TranscriptView = ({
                                     </div>
                                     <h4 className="font-semibold text-foreground">No exact matches found</h4>
                                     <p className="text-sm text-muted-foreground">
-                                        You are searching for <strong>"{search}"</strong>. Standard search only finds exact words.
+                                        You are searching for <strong>{`"${search}"`}</strong>. {"Standard search only finds exact words."}
                                     </p>
                                     
                                     <div className="pt-2">
@@ -129,7 +129,7 @@ export const TranscriptView = ({
                                             Upgrade to AI Search
                                          </Button>
                                          <p className="text-[10px] text-muted-foreground mt-2">
-                                            Pro uses AI to find <em>meanings</em> (e.g. searching "Cost" finds "$500").
+                                           {"Pro uses AI to find "}<em>{"meanings"}</em> {`(e.g. searching "Cost" finds "$500").`}
                                          </p>
                                     </div>
                                 </div>

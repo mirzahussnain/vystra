@@ -14,9 +14,16 @@ import { cn } from "@/lib/utils";
 
 const DEMO_VIDEO_URL = process.env.NEXT_PUBLIC_DEMO_VIDEO_URL || "";
 // --- 1. OPTIMIZATION: Extract Item to prevent unnecessary re-renders ---
+type TranscriptItemProps = {
+  item: { text: string, start: number, end: number };
+  query: string;
+  isActive: boolean;
+  onJump: (start: number, end: number) => void;
+  shouldScroll: boolean;
+};
 
 const TranscriptItem = React.memo(
-  ({ item, query, isActive, onJump, shouldScroll }: any) => {
+  ({ item, query, isActive, onJump, shouldScroll }: TranscriptItemProps) => {
     const parts = useMemo(() => {
       if (!query) return [item.text];
       try {
@@ -38,7 +45,7 @@ const TranscriptItem = React.memo(
         ref={itemRef}
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        onClick={() => onJump(item.start, item.end)}
+        onClick={() => onJump(item.start, item?.end)}
         
         className={cn(
           "p-4 rounded-lg border cursor-pointer transition-all duration-300 group relative overflow-hidden",

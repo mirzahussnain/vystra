@@ -18,7 +18,7 @@ from backend.app.core.config import settings
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     print("🚀 Application starting...")
-    init_bucket()  # <--- Create the bucket automatically
+    # init_bucket()  
     create_extension()
     print("Creating Database Tables")
     Base.metadata.create_all(bind=engine)

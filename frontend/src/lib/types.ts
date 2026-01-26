@@ -1,5 +1,12 @@
 export type PlanId = "free" | "pro" | "enterprise";
 
+
+export type RTQApiError = {
+  data?: {
+    detail?: string;
+  };
+  message?: string;
+};
 export interface Video {
   id: string;
   title: string,
@@ -7,11 +14,12 @@ export interface Video {
   description?: string,
   status: string,
   transcript?: string,
-  segments?: Array<object>
+  segments?: { start: number; end: number; text: string }[];
   ai_title?: string,
   summary?: string,
   key_takeaways?: Array<string>,
-  actions_items?: Array<string>
+  actions_items?: Array<string>,
+  searchBlob?: string
 }
 
 export interface VideoListProps{
@@ -56,4 +64,27 @@ export interface MobileNavProps{
   label: string,
   href: string,
   icon?: React.ReactNode,
+}
+
+export interface UserStats {
+  id: string;
+  plan: string;
+  storage: {
+    used_bytes: number;
+    limit_bytes: number;
+    percent: number;
+    is_full: boolean;
+  };
+  processing: {
+    used_minutes: number;
+    limit_minutes: number;
+    percent: number;
+    is_full: boolean;
+  };
+  ai_credits: {
+    used_actions: number;
+    limit_actions: number;
+    remaining: number;
+    is_empty: boolean;
+  };
 }

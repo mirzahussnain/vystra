@@ -1,4 +1,4 @@
-import { Hero } from "@/components/landing/Hero";
+import { Hero } from "@/components/landing/hero";
 import { Features } from "@/components/landing/feature-section"; // Updated
 
 import DemoSection from "@/components/landing/demo-section";

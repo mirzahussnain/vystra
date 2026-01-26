@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useDeferredValue, useMemo, useState } from "react";
 import { useGetVideosQuery } from "@/store/api/videoApi";
+import { Video } from "@/lib/types";
 
 
 type FilterStatus = "All" | "completed" | "pending" | "processing" | "failed";
@@ -29,10 +30,10 @@ const LibraryPage = () => {
   } = useGetVideosQuery(undefined, { pollingInterval: 3000 });
 
   const searchableVideos = useMemo(() => {
-    return videos.map((video) => ({
+    return videos.map((video:Video) => ({
       ...video,
      
-      searchBlob: `${video.title} ${video.segments?.map((s:any) => s.text).join(" ")}`.toLowerCase()
+      searchBlob: `${video.title} ${video.segments?.map((s) => s.text).join(" ")}`.toLowerCase()
     }));
   }, [videos]);
   
@@ -41,8 +42,8 @@ const LibraryPage = () => {
       const term = deferredQuery.toLowerCase();
     
   
-      return searchableVideos.filter((video) => {
-          const matchesSearch = video.searchBlob.includes(term); // Super fast string check
+      return searchableVideos.filter((video:Video) => {
+          const matchesSearch = video?.searchBlob?.includes(term); // Super fast string check
           const matchesStatus = statusFilter === "All" || video.status === statusFilter;
           return matchesSearch && matchesStatus;
         });

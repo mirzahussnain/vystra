@@ -12,7 +12,7 @@ import { useEffect, useState } from "react";
 
 export const Navbar = ({ navItems }: { navItems: MobileNavProps[] }) => {
   const { isSignedIn, isLoaded } = useUser();
-  const [activeSection, setActiveSection] = useState(null);
+  const [activeSection, setActiveSection] = useState<MobileNavProps | null>(null);
   useEffect(() => {
       
   
@@ -20,6 +20,7 @@ export const Navbar = ({ navItems }: { navItems: MobileNavProps[] }) => {
         // Add ids to your other sections too!
         
         for (const navItem of navItems) {
+          if (!navItem.id) continue;
           const element = document.getElementById(navItem.id);
           if (element) {
             const rect = element.getBoundingClientRect();
