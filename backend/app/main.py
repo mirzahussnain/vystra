@@ -49,7 +49,7 @@ app.include_router(webhooks_router, prefix="/api/v1/webhooks", tags=["Webhooks"]
 app.include_router(payments_router, prefix="/api/v1/payments", tags=["Payments"])
 
 
-@app.get("/")
+@app.get("/",)
 def read_root():
     if(settings.ENVIRONMENT == "development"):
         return {"status": "online", "storage": "minio", "db": "postgres", "cache": "redis"}
