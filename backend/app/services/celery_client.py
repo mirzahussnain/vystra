@@ -10,3 +10,19 @@ celery_client = Celery(
     broker=settings.REDIS_URL,
     backend=settings.REDIS_URL
 )
+
+# 👇 ADD THIS BLOCK TO STOP THE SPAM 👇
+celery_client.conf.update(
+    # 1. Stop it from looking for other workers (Gossip)
+    worker_enable_remote_control=False,
+    worker_mingle=False,
+    worker_gossip=False,
+    
+    # 2. Reduce Heartbeats (checks connection less often)
+    broker_heartbeat=120,
+    
+    # 3. CRITICAL for "Producer Only" mode:
+    # If your backend NEVER processes tasks itself (it only sends them),
+    # tell it to stop acting like a worker candidate.
+    worker_direct=False,
+)
