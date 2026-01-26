@@ -1,6 +1,5 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import { useUser } from "@clerk/nextjs";
 import { motion } from "framer-motion";
 import { UploadCloud, FileVideo, Lock, ArrowRight } from "lucide-react"; // Added ArrowRight
