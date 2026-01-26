@@ -101,7 +101,8 @@ def generate_upload_url(
     s3_key = f"uploads/{user.id}/{video_uuid}.{ext}"
 
     # 4. Generate Presigned URL (The Magic)
-    s3_client = get_s3_client(False)
+    is_dev = settings.ENVIRONMENT == "development"
+    s3_client = get_s3_client(is_dev)
     try:
         presigned_url = s3_client.generate_presigned_url(
             "put_object",
@@ -146,7 +147,9 @@ def confirm_upload(
     if video.status != VideoStatus.PENDING:
         return {"status": "Already processing", "task_id": None}
     # 1. Verify file actually exists in S3 (Optional but recommended)
-    s3_client = get_s3_client(False)
+    
+    is_dev = settings.ENVIRONMENT == "development"
+    s3_client = get_s3_client(is_dev)
     try:
         s3_client.head_object(Bucket=settings.AWS_BUCKET_NAME, Key=video.s3_key)
 
@@ -283,7 +286,8 @@ async def delete_video(
         raise HTTPException(status_code=404, detail="Video not found")
     try:
         if video.s3_key:
-            client = get_s3_client()
+            is_dev = settings.ENVIRONMENT == "development"
+            client = get_s3_client(is_dev)
             client.delete_object(Bucket=settings.AWS_BUCKET_NAME, Key=video.s3_key)
 
         file_size_bytes = video.file_size or 0

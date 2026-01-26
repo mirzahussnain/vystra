@@ -2,8 +2,8 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic.types import SecretType
-from backend.app.dependencies import get_current_user
+
+
 from backend.app.database.config import Base, create_extension, engine
 from backend.app.routes.videos import router as video_router
 from backend.app.routes.search import router as search_router
@@ -11,7 +11,7 @@ from backend.app.routes.users import router as users_router
 from backend.app.routes.webhooks import router as webhooks_router
 from backend.app.routes.payments import router as payments_router
 from backend.app.routes.notifications import router as notification_router
-from backend.app.services.storage import init_bucket
+
 from backend.app.core.config import settings
 
 # Lifecycle Event: Run this when the app starts
@@ -27,7 +27,7 @@ async def lifespan(app: FastAPI):
     print("🛑 Application shutting down...")
 
 
-app = FastAPI(title="InsightStream API", lifespan=lifespan)
+app = FastAPI(title="Vystra Backend API", lifespan=lifespan)
 
 print(settings.ALLOWED_ORIGINS)
 
@@ -51,5 +51,7 @@ app.include_router(payments_router, prefix="/api/v1/payments", tags=["Payments"]
 
 @app.get("/")
 def read_root():
-    return {"status": "online", "storage": "minio", "db": "postgres"}
+    if(settings.ENVIRONMENT != "development"):
+        return {"status": "online", "storage": "minio", "db": "postgres", "cache": "redis"}
+    return {"status": "online", "storage": "cloudflare-R2", "db": "NeonDB","cache": "upstash-redis"}
     
