@@ -1,4 +1,5 @@
 import boto3
+from botocore.exceptions import ClientError
 from ..core.config import settings
 
 
@@ -20,3 +21,15 @@ def download_video(video_id: str, local_path: str):
     except Exception as e:
         print(f"❌ Error downloading: {e}")
         raise e
+        
+def delete_video(s3_key:str):
+    """
+    Deletes a file from S3 bucket.
+    """
+    s3=get_s3_client()
+
+    try:
+        s3.delete_object(Bucket=settings.AWS_BUCKET_NAME, Key=s3_key)
+        print(f"🗑️ Successfully deleted {s3_key} from S3.")
+    except ClientError as e:
+        print(f"❌ Failed to delete from S3: {e}")

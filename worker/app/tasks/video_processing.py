@@ -55,7 +55,7 @@ def process_video_task(self, video_id: str):
         if duration_min > (limits["remaining_minutes"] + 2.0):
             Repository.mark_failed(
                 video_id,
-                f"Video too long ({duration_min:.1f} min). Your remaining: {limits['remaining_minutes']:.1f} min.",
+                f"Video too long ({duration_min:.1f} min). Your remaining minutes: {limits['remaining_minutes']:.1f} min. Upgrade your plan to continue.",
             )
             return
 

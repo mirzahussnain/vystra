@@ -1,19 +1,50 @@
+"use client";
 import { SignIn } from "@clerk/nextjs";
+import { dark } from "@clerk/themes";
+import { useTheme } from "next-themes";
+import { useSearchParams } from "next/navigation";
+import { Suspense, useEffect } from "react";
 
-export default function SignUpPage() {
+function SignInContent() {
+  const searchParams = useSearchParams();
+  const plan = searchParams.get("plan");
+  const { resolvedTheme } = useTheme();  
+  const redirectUrl = plan
+    ? `/dashboard?upgrade=true&plan=${plan}`
+    : "/dashboard";
+
+  useEffect(() => {
+    if (plan) {
+      localStorage.setItem("pending_plan_upgrade", plan);
+
+      // Also store timestamp to auto-expire after 1 hour
+      const expiryTime = Date.now() + 60 * 60 * 1000; // 1 hour from now
+      localStorage.setItem("pending_plan_expiry", expiryTime.toString());
+    }
+  }, [plan]);
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-50">
+    <div className="flex justify-center items-center min-h-screen ">
       <div className="p-4">
         <SignIn
-          appearance={{
-            elements: {
-              formButtonPrimary:
-                "bg-green-600 hover:bg-green-700 text-sm normal-case",
-            },
-          }}
-          fallbackRedirectUrl="/dashboard"
+          
+          fallbackRedirectUrl={redirectUrl}
+          forceRedirectUrl={redirectUrl}
         />
       </div>
     </div>
+  );
+}
+
+export default function SignInPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex justify-center items-center min-h-screen">
+          Loading...
+        </div>
+      }
+    >
+      <SignInContent />
+    </Suspense>
   );
 }

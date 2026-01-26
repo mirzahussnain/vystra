@@ -32,7 +32,7 @@ const steps = [
 
 const HowItWorks = () => {
   return (
-    <section className="py-24 bg-muted/50 dark:bg-background border-t border-border relative overflow-hidden">
+    <section className="py-24 bg-muted/50 dark:bg-background border-t border-border relative overflow-hidden" id="how-it-works">
       <div className="container mx-auto px-6 relative z-10">
         <div className="text-center mb-16">
         

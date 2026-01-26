@@ -17,6 +17,6 @@ export const apiSlice = createApi({
     },
   }),
   // Tags for caching (User, Subscription, etc.)
-  tagTypes: ["User", "Subscription","Video","Search","Notification"], 
+  tagTypes: ["User","UserStats", "Subscription","Video","Search","Notification"], 
   endpoints: () => ({}), 
 });

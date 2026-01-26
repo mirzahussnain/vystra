@@ -24,7 +24,7 @@ import {
 } from "@/store/api/userApi";
 import { useRouter } from "next/navigation";
 import { useCreateCheckoutSessionMutation } from "@/store/api/subscriptionApi";
-import { create } from "domain";
+
 
 export default function PricingPage() {
   const router = useRouter();
@@ -50,7 +50,7 @@ export default function PricingPage() {
 
   const handlePlanAction = async (plan: (typeof PLANS)[0]) => {
     if (!isSignedIn) {
-      return router.push(`/sign-up?plan${plan.id}`);
+      return router.push(`/sign-up?plan=${plan.id}`);
     }
     if (plan.id === "enterprise") {
       return router.push("/contact-us");
@@ -61,7 +61,7 @@ export default function PricingPage() {
 
     // UPGRADE FLOW (Free -> Pro)
     try {
-      // setLoadingPlanId(plan.id as PlanId);
+      setLoadingPlanId(plan.id as PlanId);
       await createCheckoutSession({planId: plan.id}).unwrap();
 
       if (checkoutSession) {
@@ -90,7 +90,7 @@ export default function PricingPage() {
   return (
     <div className="min-h-screen bg-card">
       {/* --- SECTION 1: PRICING CARDS --- */}
-      <section className="py-32 container mx-auto px-4 relative">
+      <section className="py-32 container mx-auto px-4 relative" id="pricing">
         <div className="text-center max-w-2xl mx-auto mb-16">
           <h1 className="text-5xl font-bold pb-1  bg-clip-text bg-linear-to-r  text-transparent from-primary to-purple-500 mb-4">
             Simple, Transparent Pricing

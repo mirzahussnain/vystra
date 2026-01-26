@@ -1,18 +1,18 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Search, Zap, FileText, Lock, Sparkles, Video } from "lucide-react";
+import { Search, Zap, FileText, Sparkles } from "lucide-react";
 
-export function BentoGrid() {
+export function Features() {
   return (
-    <section className="py-24 bg-background">
+    <section className="py-24 bg-background" id="features">
       <div className="container mx-auto px-6">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-5xl font-bold tracking-tight mb-4">
-            Everything you need to <span className="text-primary">master your media</span>
+            Everything you need to <span className="text-primary">Master Your Media</span>
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
-            InsightStream transforms passive video files into active, searchable knowledge bases.
+            Vystra transforms passive video files into active, searchable knowledge bases.
           </p>
         </div>
 

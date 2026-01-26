@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Inter } from "next/font/google";
+import {  Inter } from "next/font/google";
 import "./globals.css";
 import ThemeProvider from "@/layouts/theme-provider";
 import { Toaster } from "sonner";
 import StoreProvider from "@/layouts/store-provider";
-import {ClerkProvider} from "@clerk/nextjs"
+
+import ClerkAuthProvider from "@/components/global/clerk-auth-provider";
+import { cn } from "@/lib/utils";
 // const geistSans = Geist({
 //   variable: "--font-geist-sans",
 //   subsets: ["latin"],
@@ -18,7 +20,7 @@ import {ClerkProvider} from "@clerk/nextjs"
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "InsightStream",
+  title: "Vystra",
   description: "AI-Powered Video Search Engine & SaaS Platform",
 };
 
@@ -28,22 +30,22 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider>
     <html lang="en" suppressHydrationWarning>
-      <body className={inter.className}>
+      <body className={cn(inter.className,"custom-scrollbar")}>
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"
           enableSystem
           disableTransitionOnChange
         >
-          <StoreProvider>
-            {children}
-            <Toaster position="top-center" />
-          </StoreProvider>
+          <ClerkAuthProvider>
+            <StoreProvider>
+              {children}
+              <Toaster position="top-center" />
+            </StoreProvider>
+          </ClerkAuthProvider>
         </ThemeProvider>
       </body>
     </html>
-    </ClerkProvider>
   );
 }

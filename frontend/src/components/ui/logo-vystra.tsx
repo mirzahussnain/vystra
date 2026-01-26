@@ -1,3 +1,5 @@
+import { cn } from "@/lib/utils";
+
  export const LogoV = ({ width = 300, height = "auto", className = "" }) => {
   return (
     <svg
@@ -5,7 +7,7 @@
       width={width}
       height={height}
       viewBox="330 470 470 630"
-      className={className}
+      className={cn("fill-current overflow-visible",className)}
       style={{ display: 'block' }}
     >
       <defs>

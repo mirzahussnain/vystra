@@ -4,7 +4,7 @@ export const videosApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     // Get All Videos (Supports Search)
     getVideos: builder.query({
-      query: ({ search }) => ({
+      query: (search) => ({
         url: "/videos",
         params: {
           search,

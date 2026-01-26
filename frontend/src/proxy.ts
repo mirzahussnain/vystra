@@ -1,5 +1,5 @@
 import {  clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
-import { NextResponse } from 'next/server';
+
 
 // Define routes that are OPEN to everyone
 

@@ -7,11 +7,13 @@ import {
   LayoutGrid,
   PlaySquare,
   Settings,
-  LogOut,
   PlusCircle,
+  Home,
 } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import Router from "next/router";
+import { LogoV } from "../ui/logo-vystra";
 
 const navItems = [
   { icon: LayoutGrid, label: "Overview", href: "/dashboard" },
@@ -21,15 +23,17 @@ const navItems = [
 
 const Sidebar = () => {
   const pathname = usePathname();
+  const router = useRouter();
 
   return (
     <div className="flex flex-col h-full">
       {/* Sidebar Header */}
       <div className="h-16 flex items-center px-6 border-b border-border/50">
-        <Link href="/" className="flex items-center gap-2">
-          <Logo className="w-6 h-6 text-primary" />
-          <span className="font-bold text-lg tracking-tight">
-            InsightStream
+        <Link href="/" className="flex items-center ">
+          <LogoV className="max-w-12" />
+          <span className="font-bold text-xl tracking-tight text-foreground">
+            ystra
+            {/*Insight<span className="text-primary">Stream</span>*/}
           </span>
         </Link>
       </div>
@@ -70,13 +74,14 @@ const Sidebar = () => {
       </div>
 
       {/* Sidebar Footer */}
-      <div className="p-4 border-t border-border/50">
+      <div className="p-4 border-t border-border/50 ">
         <Button
           variant="ghost"
-          className="w-full justify-start gap-3 text-muted-foreground hover:text-red-500"
+          className="w-full justify-start gap-3 text-muted-foreground hover:text-red-500 cursor-pointer"
+          onClick={() => router.push("/")}
         >
-          <LogOut className="w-4 h-4" />
-          Sign Out
+          <Home className="w-4 h-4" />
+          Home
         </Button>
       </div>
     </div>

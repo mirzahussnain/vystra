@@ -52,6 +52,8 @@
   /* Fonts */
   --font-sans: var(--font-geist-sans), "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, monospace;
+  
+  --animate-flip: flip 2s infinite ease-in-out;
 
   /* Animation Utilities */
   --animate-marquee: marquee 30s linear infinite;
@@ -59,118 +61,166 @@
     0% { transform: translateX(0); }
     100% { transform: translateX(-50%); }
   }
+  
+  @keyframes flip {
+      0% {
+        transform: perspective(1000px) rotateY(0deg);
+      }
+      50% {
+        transform: perspective(1000px) rotateY(180deg);
+      }
+      100% {
+        transform: perspective(1000px) rotateY(360deg);
+      }
+    }
 }
 
-/* 2. THEME COLORS (OKLCH) */
+/* 2. THEME COLORS (OKLCH) - UPDATED FOR VYSTRA */
 :root {
-  /* --- Light Mode: Clean, Technical, Airy --- */
-  /* Background: Slate-50 (Cool White) */
-  --background: oklch(0.985 0.003 247.858); 
-  /* Foreground: Slate-900 (Deep readable text) */
-  --foreground: oklch(0.145 0.028 266.378); 
+  /* --- Light Mode: Crisp, Technical, Clean --- */
+  
+  /* Background: Faint cool white (matches the "air" of the logo) */
+  --background: oklch(0.99 0.005 260); 
+  
+  /* Foreground: Deep Navy (Almost black, softer than pure black) */
+  --foreground: oklch(0.13 0.05 265); 
 
   /* Card: Pure White */
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0.028 266.378);
+  --card-foreground: oklch(0.13 0.05 265);
 
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0.028 266.378);
+  --popover-foreground: oklch(0.13 0.05 265);
 
-  /* Primary: Indigo-600 (Vibrant, trustworthy blue-purple) */
-  --primary: oklch(0.511 0.262 276.966);
-  --primary-foreground: oklch(0.985 0.003 247.858);
+  /* Primary: Neon Purple/Indigo (Matches logo right side) */
+  --primary: oklch(0.55 0.25 280); 
+  --primary-foreground: oklch(1 0 0); 
 
-  /* Secondary: Slate-100 (Subtle gray) */
-  --secondary: oklch(0.97 0.01 254.604);
-  --secondary-foreground: oklch(0.205 0.042 265.755);
+  /* Secondary: Light Lavender-Grey */
+  --secondary: oklch(0.96 0.02 280);
+  --secondary-foreground: oklch(0.40 0.15 280);
 
-  /* Muted: Slate-100 */
-  --muted: oklch(0.97 0.01 254.604);
-  --muted-foreground: oklch(0.556 0.031 256.8);
+  /* Muted: Cool Grey */
+  --muted: oklch(0.96 0.01 260);
+  --muted-foreground: oklch(0.55 0.05 260);
 
-  /* Accent: Light Indigo (For hover states) */
-  --accent: oklch(0.967 0.01 254.604);
-  --accent-foreground: oklch(0.205 0.042 265.755);
+  /* Accent: Very light purple hover state */
+  --accent: oklch(0.96 0.02 280);
+  --accent-foreground: oklch(0.40 0.15 280);
 
-  /* Destructive: Red-600 */
+  /* Destructive: Red */
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: oklch(0.985 0 0);
 
-  /* Borders: Slate-200 */
-  --border: oklch(0.922 0.012 255.091);
-  --input: oklch(0.922 0.012 255.091);
-  /* Ring: Indigo-500 */
-  --ring: oklch(0.585 0.233 277.117);
+  /* Borders: Subtle Cool Grey */
+  --border: oklch(0.92 0.01 260);
+  --input: oklch(0.92 0.01 260);
+  
+  /* Ring: Matching the Primary Purple */
+  --ring: oklch(0.55 0.25 280);
 
   --radius: 0.625rem;
 
   /* Sidebar (Light) */
-  --sidebar: oklch(0.985 0.003 247.858);
-  --sidebar-foreground: oklch(0.145 0.028 266.378);
-  --sidebar-primary: oklch(0.511 0.262 276.966);
-  --sidebar-primary-foreground: oklch(0.985 0.003 247.858);
-  --sidebar-accent: oklch(0.97 0.01 254.604);
-  --sidebar-accent-foreground: oklch(0.205 0.042 265.755);
-  --sidebar-border: oklch(0.922 0.012 255.091);
-  --sidebar-ring: oklch(0.585 0.233 277.117);
+  --sidebar: oklch(0.98 0.005 260); /* Slightly offset from pure white */
+  --sidebar-foreground: oklch(0.13 0.05 265);
+  --sidebar-primary: oklch(0.55 0.25 280);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.96 0.02 280);
+  --sidebar-accent-foreground: oklch(0.40 0.15 280);
+  --sidebar-border: oklch(0.92 0.01 260);
+  --sidebar-ring: oklch(0.55 0.25 280);
 }
 
 .dark {
-  /* --- Dark Mode: Deep Space Indigo --- */
-  /* Background: Slate-950 (Rich, deep navy-black) */
-  --background: oklch(0.09 0.03 260); 
-  /* Foreground: Slate-50 (Crisp white text) */
-  --foreground: oklch(0.985 0.003 247.858);
+  /* --- Dark Mode: "Deep Space" (Matches the Dark Blue in Logo) --- */
+  
+  /* Background: Deep Indigo-Black (Creates glassy tech look) */
+  --background: oklch(0.10 0.05 275); 
 
-  /* Card: Slate-900 (Slightly lighter than BG for depth) */
-  --card: oklch(0.13 0.028 261.692);
-  --card-foreground: oklch(0.985 0.003 247.858);
+  /* Foreground: White with a tiny hint of blue */
+  --foreground: oklch(0.98 0.01 280);
 
-  --popover: oklch(0.13 0.028 261.692);
-  --popover-foreground: oklch(0.985 0.003 247.858);
+  /* Card: Slightly lighter Indigo-Black */
+  --card: oklch(0.14 0.06 275);
+  --card-foreground: oklch(0.98 0.01 280);
 
-  /* Primary: Indigo-500 (Brighter and glowing against dark bg) */
-  --primary: oklch(0.585 0.233 277.117);
-  --primary-foreground: oklch(0.985 0.003 247.858);
+  --popover: oklch(0.14 0.06 275);
+  --popover-foreground: oklch(0.98 0.01 280);
 
-  /* Secondary: Slate-800 */
-  --secondary: oklch(0.26 0.03 260);
-  --secondary-foreground: oklch(0.985 0.003 247.858);
+  /* Primary: Neon Purple (Glows against dark bg) */
+  --primary: oklch(0.60 0.25 280); 
+  --primary-foreground: oklch(1 0 0);
 
-  /* Muted: Slate-800 */
-  --muted: oklch(0.26 0.03 260);
-  --muted-foreground: oklch(0.70 0.04 256.788);
+  /* Secondary: Deep Violet (For muted buttons) */
+  --secondary: oklch(0.25 0.10 275);
+  --secondary-foreground: oklch(0.98 0.01 280);
 
-  /* Accent: Slate-800/50 */
-  --accent: oklch(0.26 0.03 260);
-  --accent-foreground: oklch(0.985 0.003 247.858);
+  /* Muted: Deep Indigo */
+  --muted: oklch(0.25 0.10 275);
+  --muted-foreground: oklch(0.70 0.05 280);
 
-  /* Destructive: Red-900 */
+  /* Accent: Hover state */
+  --accent: oklch(0.25 0.10 275);
+  --accent-foreground: oklch(0.98 0.01 280);
+
+  /* Destructive: Deep Red */
   --destructive: oklch(0.39 0.19 27);
   --destructive-foreground: oklch(0.985 0 0);
 
-  /* Border: 15% opacity white for glass effect */
-  --border: oklch(0.985 0 0 / 0.12);
-  --input: oklch(0.985 0 0 / 0.12);
-  /* Ring: Indigo-400 */
-  --ring: oklch(0.673 0.182 276.935);
+  /* Border: 15% opacity white/purple mixture */
+  --border: oklch(0.98 0.01 280 / 0.15);
+  --input: oklch(0.98 0.01 280 / 0.15);
+  
+  /* Ring: Glowing Purple */
+  --ring: oklch(0.60 0.25 280);
 
   /* Sidebar (Dark) */
-  --sidebar: oklch(0.13 0.028 261.692);
-  --sidebar-foreground: oklch(0.985 0.003 247.858);
-  --sidebar-primary: oklch(0.585 0.233 277.117);
-  --sidebar-primary-foreground: oklch(0.985 0.003 247.858);
-  --sidebar-accent: oklch(0.26 0.03 260);
-  --sidebar-accent-foreground: oklch(0.985 0.003 247.858);
-  --sidebar-border: oklch(0.985 0 0 / 0.12);
-  --sidebar-ring: oklch(0.673 0.182 276.935);
+  --sidebar: oklch(0.14 0.06 275); /* Matches Card */
+  --sidebar-foreground: oklch(0.98 0.01 280);
+  --sidebar-primary: oklch(0.60 0.25 280);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.25 0.10 275);
+  --sidebar-accent-foreground: oklch(0.98 0.01 280);
+  --sidebar-border: oklch(0.98 0.01 280 / 0.15);
+  --sidebar-ring: oklch(0.60 0.25 280);
 }
 
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
+  html {
+    @apply scroll-smooth;
+  }
   body {
     @apply bg-background text-foreground antialiased;
   }
+}
+
+/* 3. Global Scrollbar Styling */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+
+/* Chrome, Edge, Safari */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent; 
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--border); /* Uses your new theme variable */
+  border-radius: 9999px; /* Fully rounded */
+  border: 3px solid transparent; /* Creates the "floating" look */
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--muted-foreground);
 }

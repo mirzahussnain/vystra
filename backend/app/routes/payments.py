@@ -10,7 +10,6 @@ stripe.api_key = settings.STRIPE_API_KEY
 
 
 @router.post("/create-checkout-session")
-
 def create_checkout_session(
     req: CheckoutRequest,                   # <--- Accept JSON body
     user: User = Depends(get_current_user),
@@ -21,6 +20,13 @@ def create_checkout_session(
         raise HTTPException(status_code=400, detail="Invalid plan selected")
 
     try:
+        if user.plan == req.plan:
+                # Create a Portal Session instead (Manage Subscription)
+                portal_session = stripe.billing_portal.Session.create(
+                    customer=user.stripe_customer_id,
+                    return_url=f"{settings.FRONTEND_URL}/dashboard"
+                )
+                return {"url": portal_session.url}
         
         checkout_session = stripe.checkout.Session.create(
             payment_method_types=['card'],
@@ -39,3 +45,18 @@ def create_checkout_session(
     except Exception as e:
         print(f"Stripe Error: {e}")
         raise HTTPException(status_code=500, detail="Checkout failed")
+        
+        
+@router.post("/create-customer-portal-session")
+def create_customer_portal_session(
+    user: User = Depends(get_current_user),
+):
+    try:
+        portal_session = stripe.billing_portal.Session.create(
+            customer=user.stripe_customer_id,
+            return_url=f"{settings.FRONTEND_URL}/dashboard/settings"
+        )
+        return {"url": portal_session.url}
+    except Exception as e:
+        print(f"Stripe Error: {e}")
+        raise HTTPException(status_code=500, detail="Portal session creation failed")

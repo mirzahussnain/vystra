@@ -9,6 +9,12 @@ export const userApi = apiSlice.injectEndpoints({
       }),
       providesTags: ["User"]
     }),
+    getUserStats:builder.query({
+      query: () => ({
+        url: `/users/me/usage`,
+      }),
+      providesTags: ["UserStats"]
+    })
     // upgradeUserPlan: builder.mutation({
     //   query: (planId) => ({
     //     url: `/users/me/plan/upgrade`,
@@ -20,4 +26,4 @@ export const userApi = apiSlice.injectEndpoints({
 })
 
 
-export const { useGetUserDetailsQuery } = userApi;
+export const { useGetUserDetailsQuery, useGetUserStatsQuery } = userApi;

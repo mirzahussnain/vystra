@@ -52,6 +52,7 @@ export interface AnalysisData {
 }
 
 export interface MobileNavProps{
+  id?:string,
   label: string,
   href: string,
   icon?: React.ReactNode,

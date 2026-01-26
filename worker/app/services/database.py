@@ -78,7 +78,7 @@ class Repository:
                     Notification(
                         video_id=video_id,
                         user_id=video.user_id,
-                        message=f"Failed: Could not process '{video.title}'.",
+                        message=f"Could not process '{video.title}': {error_msg}",
                         type=NotificationType.ERROR.value,
                     )
                 )

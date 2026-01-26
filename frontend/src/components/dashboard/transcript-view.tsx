@@ -9,6 +9,9 @@ import { TranscriptViewProps } from "@/lib/types";
 import { SmartSearch } from "../global/smart-search";
 import { Sparkles,Lock } from "lucide-react";
 import { Button } from "../ui/button";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store/store";
+import { useRouter } from "next/navigation";
 
 /**
  * UTILITY: Escape special characters for Regex.
@@ -24,14 +27,16 @@ export const TranscriptView = ({
   currentTime,
   onSeek,
   video_Id,
-  isPro=true,
-}: TranscriptViewProps) =>{
+  isPro=false,
+}: TranscriptViewProps) => {
+  const userStats=useSelector((state:RootState)=>state.stats)
   const [search, setSearch] = useState("");
   const [filteredTranscript, setFilteredTranscript] = useState(segments);
   // REF: Tracks if the user is hovering over the list.
   const isUserHovering = useRef(false);
+  const router = useRouter();
   
-  
+
   // EFFECT: Reset the list when the video changes.
   // This ensures that if you switch from Video A to Video B, you don't see Video A's leftover search results.
     useEffect(() => {
@@ -40,6 +45,7 @@ export const TranscriptView = ({
  
   // Find the index of the segment currently playing in the video.
   const activeIndex = useMemo(() => {
+    if (!filteredTranscript) return -1;
     return filteredTranscript?.findIndex(
       (seg) => currentTime >= seg.start && currentTime < seg.end,
     );
@@ -82,7 +88,7 @@ export const TranscriptView = ({
       {/* Header: Search Bar */}
       <div className="block p-4 md:border-b md:border-border bg-muted/20 ">
         <h3 className="hidden md:flex font-semibold mb-3  items-center gap-2">
-          Transcript
+          Transcript ({userStats?.plan === 'pro' || userStats?.plan === 'enterprise' ? 'Pro' : 'Free'})
           <span className="text-xs font-normal truncate bg-primary/10 px-2 py-0.5 rounded-full text-primary">
             {filteredTranscript?.length} segments
           </span>
@@ -94,7 +100,7 @@ export const TranscriptView = ({
           segments={segments}
           filterTranscript={setFilteredTranscript}
           video_Id={video_Id}
-          isPro={isPro}
+          isPro={userStats?.plan === 'pro' || userStats?.plan === 'enterprise'}
           onSearchChange={setSearch}
         />
       </div>
@@ -117,7 +123,8 @@ export const TranscriptView = ({
                                     </p>
                                     
                                     <div className="pt-2">
-                                         <Button variant="default" size="sm" className="w-full gap-2">
+                    <Button variant="default" size="sm" className="w-full gap-2"
+                      onClick={() => router.push('/pricing')}>
                                             <Lock className="w-3 h-3" />
                                             Upgrade to AI Search
                                          </Button>

@@ -16,7 +16,7 @@ def search_transcript(
     """
     try:
         # 1. Convert User Query -> Vector
-        query_vector = search_model.encode(query_text).tolist()
+        query_vector = list(search_model.embed([query_text]))[0].tolist()
 
         # Query BOTH VideoSegment and Video to access video.title later
         sql_query = db.query(VideoSegment, Video).join(Video)

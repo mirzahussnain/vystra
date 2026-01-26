@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect, useMemo, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Play, Pause, Loader2, AlertCircle } from "lucide-react";
+import { Search, Play, Pause, AlertCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Particles } from "../ui/particles";
 import React from "react";
@@ -39,6 +39,7 @@ const TranscriptItem = React.memo(
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         onClick={() => onJump(item.start, item.end)}
+        
         className={cn(
           "p-4 rounded-lg border cursor-pointer transition-all duration-300 group relative overflow-hidden",
           isActive
@@ -143,7 +144,7 @@ const DemoSection = () => {
   }, [isPlaying]);
 
   return (
-    <section className="relative py-32 bg-background border-t border-border overflow-hidden">
+    <section className="relative py-32 bg-background border-t border-border overflow-hidden" id="demo-section">
       {/* 1. PARTICLE BACKGROUND */}
       <Particles className="z-0 absolute inset-0" />
 
@@ -153,7 +154,7 @@ const DemoSection = () => {
       <div className="container relative z-10 mx-auto px-6">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-5xl font-bold tracking-tight mb-6 text-foreground">
-            See it in <span className="text-primary">action</span>
+            See it in <span className="text-primary">Action</span>
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             Try searching the transcript below. Type{" "}

@@ -1,16 +1,40 @@
 import Link from "next/link";
 import MobileNav from "../global/mobile-nav";
-import Logo from "../ui/logo";
+
 import { LogoV } from "../ui/logo-vystra";
 import ModeToggle from "../ui/theme-toggler";
 import { Button } from "../ui/button";
 import { MobileNavProps } from "@/lib/types";
-import { UserButton, useUser } from "@clerk/nextjs";
-import { Loader2 } from "lucide-react";
+import {  useUser } from "@clerk/nextjs";
+import UserProfileButton from "../global/user-profile-button";
+import { useEffect, useState } from "react";
+
 
 export const Navbar = ({ navItems }: { navItems: MobileNavProps[] }) => {
-  const { isSignedIn, isLoaded, user } = useUser();
-
+  const { isSignedIn, isLoaded } = useUser();
+  const [activeSection, setActiveSection] = useState(null);
+  useEffect(() => {
+      
+  
+      const handleScroll = () => { 
+        // Add ids to your other sections too!
+        
+        for (const navItem of navItems) {
+          const element = document.getElementById(navItem.id);
+          if (element) {
+            const rect = element.getBoundingClientRect();
+            // If section is roughly in the middle of viewport
+            if (rect.top >= 0 && rect.top <= 300) {
+              setActiveSection(navItem);
+              break;
+            }
+          }
+        }
+      };
+  
+      window.addEventListener("scroll", handleScroll);
+      return () => window.removeEventListener("scroll", handleScroll);
+    });
   return (
     <header className="fixed top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-xl">
       <div className="container mx-auto flex h-16 items-center justify-between px-6">
@@ -35,7 +59,7 @@ export const Navbar = ({ navItems }: { navItems: MobileNavProps[] }) => {
             <Link
               key={index}
               href={item.href}
-              className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
+              className={`${activeSection === item ? "text-primary border-b-2 border-primary" : "text-sm font-medium text-muted-foreground transition-colors hover:text-primary"}`}
             >
               {item.label}
             </Link>
@@ -49,7 +73,7 @@ export const Navbar = ({ navItems }: { navItems: MobileNavProps[] }) => {
           {!isLoaded ? (
             <div className="hidden sm:block w-20 h-9 rounded-md bg-muted/70 animate-pulse"></div>
           ) : isSignedIn ? (
-            <UserButton />
+            <UserProfileButton/>
           ) : (
             <Link href="/dashboard">
               <Button

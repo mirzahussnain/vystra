@@ -2,9 +2,7 @@
 
 import { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
-import { UploadCloud, FileVideo, Loader2, X } from "lucide-react";
-import { useUploadVideoMutation } from "@/store/api/videoApi"; // <--- NEW IMPORT
-import { toast } from "sonner";
+import { UploadCloud, FileVideo, Loader2, X } from "lucide-react"; // <--- NEW IMPORT
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { useVideoUpload } from "@/hooks/upload-video";

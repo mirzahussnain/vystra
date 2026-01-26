@@ -10,9 +10,15 @@ const subscriptionApi = apiSlice.injectEndpoints({
         body: { plan:planId }
       }),
       invalidatesTags:["Subscription"],
-    })
+    }),
+    createCustomerPortalSession: builder.mutation<{ url: string }, void>({
+          query: () => ({
+            url: "/payments/create-customer-portal-session",
+            method: "POST",
+          }),
+        }),
   })
   
 })
 
-export const { useCreateCheckoutSessionMutation } = subscriptionApi;
+export const { useCreateCheckoutSessionMutation, useCreateCustomerPortalSessionMutation } = subscriptionApi;

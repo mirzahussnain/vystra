@@ -17,7 +17,7 @@ import { useDeferredValue, useMemo, useState } from "react";
 import { useGetVideosQuery } from "@/store/api/videoApi";
 
 
-type FilterStatus = "All" | "completed" | "processing" | "failed";
+type FilterStatus = "All" | "completed" | "pending" | "processing" | "failed";
 const LibraryPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<FilterStatus>("All");
@@ -115,6 +115,12 @@ const LibraryPage = () => {
                 onCheckedChange={() => setStatusFilter("completed")}
               >
                 Completed
+              </DropdownMenuCheckboxItem>
+              <DropdownMenuCheckboxItem
+                checked={statusFilter === "pending"}
+                onCheckedChange={() => setStatusFilter("pending")}
+              >
+                Pending
               </DropdownMenuCheckboxItem>
               <DropdownMenuCheckboxItem
                 checked={statusFilter === "processing"}

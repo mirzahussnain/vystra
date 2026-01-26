@@ -8,18 +8,15 @@ import { formatBytes, formatDuration } from "@/lib/utils";
 import {
   useGetDashboardStatsQuery,
   useGetVideosQuery,
-  useLazyGetVideosQuery,
 } from "@/store/api/videoApi";
-import { useAuth, useUser } from "@clerk/nextjs";
+import { useUser } from "@clerk/nextjs";
 import { Activity, Clock, FileVideo, HardDrive } from "lucide-react";
-import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { toast } from "sonner";
+
 
 const DashboardPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const pathname = usePathname();
-  const { user, isLoaded: userLoaded, isSignedIn } = useUser();
+  const {  isLoaded: userLoaded } = useUser();
   const [pollingInterval, setPollingInterval] = useState(0);
   const {
     data: stats,
@@ -33,19 +30,14 @@ const DashboardPage = () => {
     data: videos,
     isLoading: videosLoading,
     isError: videoError,
-    error,
+    error: video_error,
   } = useGetVideosQuery(
-    { search: searchTerm },
+    searchTerm,
     {
       pollingInterval: pollingInterval,
     },
-    );
-  
-  useEffect(() => {
-    if (pathname.includes('sucess')) {
-      toast.success('Plan Successfully, updated.')
-    }
-  },[pathname])
+  );
+
 
   useEffect(() => {
     if (videos) {
@@ -60,21 +52,29 @@ const DashboardPage = () => {
   }, [videos]);
 
   if (!userLoaded || videosLoading || statsLoading) {
-    return <Loader text="Loading Dashboard" />;
-  }
-  if (videoError || statsError) {
     return (
-      <ErrorDisplayer
-        error={`Failed to fetch videos for user: ${error?.data?.detail || stats_error?.data?.detail}`}
+      <Loader
+        text={ "Loading Dashboard"
+        }
       />
     );
   }
 
-  
+  const errorMessage =
+    (video_error as any)?.data?.details ||
+    (stats_error as any)?.data?.details ||
+   
+    "An unexpected error occurred";
 
-  // "Hours Saved" Logic: Assuming summarizing takes 2x the video length manually
-  const hoursSaved = (((stats?.total_minutes || 0) * 2) / 60).toFixed(1);
-  
+  if (videoError || statsError) {
+    return (
+      <ErrorDisplayer error={`Failed to load dashboard: ${errorMessage}`} />
+    );
+  }
+
+  // // "Hours Saved" Logic: Assuming summarizing takes 2x the video length manually
+  // const hoursSaved = (((stats?.total_minutes || 0) * 2) / 60).toFixed(1);
+
   return (
     <>
       <div className="flex flex-col md:flex-row items-center justify-between">
@@ -95,7 +95,6 @@ const DashboardPage = () => {
           value={`${stats?.minutes_used || 0}`}
           icon={Clock}
           desc={`${Math.round(stats?.minutes_percent || 0)}% of ${formatDuration(stats?.minutes_limit || 0)} limit`}
-          
         />
         <StatsCard
           title="Storage Used"

@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 from backend.app.routes.payments import create_checkout_session
 
 from ..core.config import settings
-from ..database.config import get_db
+from ..database.config import SessionLocal, get_db
 from ..database.enums import PlanType
 from ..database.models import User, Video
 from ..database.schema import UserCreate  # Defined in previous step
@@ -102,40 +102,42 @@ def get_user_usage(user: User = Depends(get_current_user)):
     Returns a comprehensive usage report for the Dashboard.
     Tracks: Storage (MB), Processing (Minutes), and AI (Requests).
     """
-
-    def calc_percent(used, limit):
-        if limit <= 0:
-            return 100
-        return min((used / limit) * 100, 100)
-
-    return {
-        "id": user.id,
-        "plan": user.plan.value if hasattr(user.plan, "value") else user.plan,
-        # 1. Storage Quota (Bytes) - "Hard Limit"
-        # Used for preventing new uploads
-        "storage": {
-            "used_bytes": user.used_storage_bytes,
-            "limit_bytes": user.max_storage_bytes,
-            "percent": calc_percent(user.used_storage_bytes, user.max_storage_bytes),
-            "is_full": user.used_storage_bytes >= user.max_storage_bytes,
-        },
-        # 2. Processing Quota (Minutes) - "Soft Limit"
-        # Used for video length allowance
-        "processing": {
-            "used_minutes": user.used_minutes,
-            "limit_minutes": user.max_minutes,
-            "percent": calc_percent(user.used_minutes, user.max_minutes),
-            "is_full": user.used_minutes >= user.max_minutes,
-        },
-        # 3. AI Actions (Credits) - "Pay-per-Request"
-        # Used for Chat/Search features
-        "ai_credits": {
-            "used_actions": user.used_ai_actions,
-            "limit_actions": user.max_ai_actions,
-            "remaining": user.max_ai_actions - user.used_ai_actions,
-            "is_empty": user.used_ai_actions >= user.max_ai_actions,
-        },
-    }
+    with SessionLocal() as db:
+        def calc_percent(used, limit):
+            if limit <= 0:
+                return 100
+            return min((used / limit) * 100, 100)
+            
+        total_videos = db.query(Video).filter(Video.user_id == user.id).count()
+        return {
+            "id": user.id,
+            "plan": user.plan.value if hasattr(user.plan, "value") else user.plan,
+            "total_videos": total_videos,
+            # 1. Storage Quota (Bytes) - "Hard Limit"
+            # Used for preventing new uploads
+            "storage": {
+                "used_bytes": user.used_storage_bytes,
+                "limit_bytes": user.max_storage_bytes,
+                "percent": calc_percent(user.used_storage_bytes, user.max_storage_bytes),
+                "is_full": user.used_storage_bytes >= user.max_storage_bytes,
+            },
+            # 2. Processing Quota (Minutes) - "Soft Limit"
+            # Used for video length allowance
+            "processing": {
+                "used_minutes": user.used_minutes,
+                "limit_minutes": user.max_minutes,
+                "percent": calc_percent(user.used_minutes, user.max_minutes),
+                "is_full": user.used_minutes >= user.max_minutes,
+            },
+            # 3. AI Actions (Credits) - "Pay-per-Request"
+            # Used for Chat/Search features
+            "ai_credits": {
+                "used_actions": user.used_ai_actions,
+                "limit_actions": user.max_ai_actions,
+                "remaining": user.max_ai_actions - user.used_ai_actions,
+                "is_empty": user.used_ai_actions >= user.max_ai_actions,
+            },
+        }
     
 @router.get("/users/me")
 async def get_user(user: User = Depends(get_current_user)):

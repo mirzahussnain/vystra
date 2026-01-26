@@ -1,6 +1,6 @@
 import uuid
 
-from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import or_,update
 from sqlalchemy.orm import Session
 
@@ -11,10 +11,10 @@ from ..database.models import User, Video
 from ..database.schema import (
     PresignedUrlRequest,
     PresignedUrlResponse,
-    UploadVideoResponse,
+   
     VideoResponse,
 )
-from ..dependencies import get_current_user, require_ai_quota, require_storage_quota
+from ..dependencies import get_current_user, require_storage_quota
 from ..services.celery_client import celery_client
 from ..services.storage import get_s3_client
 
@@ -270,13 +270,24 @@ def get_video_url(
 
 
 @router.delete("/videos/{video_id}")
-async def delete_video(video_id: str, db: Session = Depends(get_db)):
-    video = db.query(Video).filter(Video.id == video_id).first()
+async def delete_video(video_id: str,user:User=Depends(get_current_user), db: Session = Depends(get_db)):
+    video = db.query(Video).filter(Video.id == video_id,Video.user_id == user.id).first()
     if video is None:
         raise HTTPException(status_code=404, detail="Video not found")
     try:
-        client = get_s3_client()
-        client.delete_object(Bucket=settings.AWS_BUCKET_NAME, Key=video.s3_key)
+        if video.s3_key:
+                    client = get_s3_client()
+                    client.delete_object(Bucket=settings.AWS_BUCKET_NAME, Key=video.s3_key)
+        
+        
+        file_size_bytes = video.file_size or 0                     
+        # Subtract size from user usage
+        user.used_storage_bytes -= file_size_bytes
+        
+        # Safety Net: Prevent negative storage numbers
+        if user.used_storage_bytes < 0:
+            user.used_storage_bytes = 0
+        db.add(user)
         db.delete(video)
         db.commit()
         return {"success": True, "message": "Video deleted successfully"}

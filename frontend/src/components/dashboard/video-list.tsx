@@ -33,6 +33,7 @@ import {
 import { toast } from "sonner";
 import { useDeleteVideoMutation } from "@/store/api/videoApi";
 import ErrorDisplayer from "../global/error-displayer";
+import Loader from "../global/loader";
 
 
 export function VideoList({ videos, isLoading, isError }: VideoListProps) {
@@ -57,10 +58,7 @@ export function VideoList({ videos, isLoading, isError }: VideoListProps) {
  
   if (isLoading || isDeleting) {
     return (
-      <div className="flex flex-col items-center justify-center h-[300px] text-muted-foreground">
-        <Loader2 className="w-8 h-8 animate-spin mb-4 text-primary" />
-        <p>Loading your library...</p>
-      </div>
+     <Loader text={`${isLoading ? "Loading your library..." : "Deleting video..."}`} />
     );
   }
 

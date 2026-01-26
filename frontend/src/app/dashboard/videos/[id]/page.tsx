@@ -29,6 +29,7 @@ import { AIInsights } from "@/components/dashboard/ai-insights";
 import { useGetVideoByIdQuery, useGetVideoUrlQuery } from "@/store/api/videoApi";
 import { toast } from "sonner";
 import ErrorDisplayer from "@/components/global/error-displayer";
+import { FailedVideoState } from "@/components/dashboard/failed-video-status";
 
 export default function VideoAnalysisPage() {
   const { id } = useParams();
@@ -51,6 +52,12 @@ export default function VideoAnalysisPage() {
   const [currentTime, setCurrentTime] = useState(0);
   const videoRef = useRef<HTMLVideoElement>(null);
 
+  
+  useEffect(() => {
+      if (metaData?.title) {
+        document.title = `${metaData.title} | Vystra`;
+      }
+    }, [metaData]);
   // --- EXPORT LOGIC ---
   const downloadFile = (content: string, type: "json" | "txt") => {
     const mimeType = type === "json" ? "application/json" : "text/plain";
@@ -113,8 +120,11 @@ export default function VideoAnalysisPage() {
     );
   }
    
-  if(metaError || urlError) return (<ErrorDisplayer error={`${metaError.data?.detail || urlError?.data?.detail}`}/>)
-
+  if (metaError || urlError) return (<ErrorDisplayer error={`${metaError.data?.detail || urlError?.data?.detail}`} />)
+  
+  if (metaData?.status === 'failed') {
+      return <FailedVideoState reason={metaData?.processing_error} id={metaData?.id} />;
+    }
   if (!metaData || !streamData?.url) {
     return (
       <div className="flex flex-col items-center justify-center h-[50vh] gap-4">

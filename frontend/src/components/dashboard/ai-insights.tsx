@@ -63,7 +63,7 @@ export const AIInsights = ({ ...insightData }: AnalysisData) => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="leading-7 text-primary/70 text-justify ">
+              <p className="leading-7 text-secondary-foreground/70 text-justify ">
                 {insightData?.summary}
               </p>
             </CardContent>
@@ -96,7 +96,7 @@ export const AIInsights = ({ ...insightData }: AnalysisData) => {
                       type="checkbox"
                       className="mt-1 border-gray-300 rounded text-blue-600 focus:ring-blue-500"
                     />
-                    <span className="text-sm font-medium text-primary/70">
+                    <span className="text-sm font-medium text-secondary-foreground/70">
                       {item}
                     </span>
                   </li>
@@ -127,7 +127,7 @@ export const AIInsights = ({ ...insightData }: AnalysisData) => {
                   <li key={i} className="flex items-start gap-4">
                     <CircleSmall className="w-3 h-3 text-primary mt-2 shrink-0" />
 
-                    <span className="text-primary/70 leading-relaxed ">
+                    <span className="text-secondary-foreground/70 leading-relaxed ">
                       {point}.
                     </span>
                   </li>
