@@ -7,6 +7,7 @@ import StoreProvider from "@/layouts/store-provider";
 
 import ClerkAuthProvider from "@/components/global/clerk-auth-provider";
 import { cn } from "@/lib/utils";
+import BackendWaker from "@/components/global/backend-waker";
 // const geistSans = Geist({
 //   variable: "--font-geist-sans",
 //   subsets: ["latin"],
@@ -40,6 +41,7 @@ export default function RootLayout({
         >
           <ClerkAuthProvider>
             <StoreProvider >
+              <BackendWaker/>
               {children}
               <Toaster position="top-center" />
             </StoreProvider>
