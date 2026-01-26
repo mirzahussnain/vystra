@@ -24,7 +24,7 @@ export default function BackendWaker() {
 
       try {
         // 2. Ping the backend
-        await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/`)
+        await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/`)
       } catch (error) {
         console.log("Wake-up ping finished (ignoring error)")
       } finally {
