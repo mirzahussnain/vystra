@@ -101,7 +101,7 @@ def generate_upload_url(
     s3_key = f"uploads/{user.id}/{video_uuid}.{ext}"
 
     # 4. Generate Presigned URL (The Magic)
-    s3_client = get_s3_client(True)
+    s3_client = get_s3_client(False)
     try:
         presigned_url = s3_client.generate_presigned_url(
             "put_object",

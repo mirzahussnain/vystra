@@ -10,6 +10,7 @@ import {
 import { Input } from "../ui/input";
 import { useLazySemanticSearchVideosQuery } from "@/store/api/videoApi";
 import { toast } from "sonner";
+import { RTQApiError } from "@/lib/types";
 
 interface SmartSearchProps {
   video_Id?: string;
@@ -62,10 +63,10 @@ export const SmartSearch = ({
         search: searchText,
         video_id: video_Id,
       }).unwrap();
-    } catch (error) {
+      } catch (error:unknown) {
       toast.error("Search failed", {
         description:
-          error?.data?.detail || "Something went wrong. Please try again.",
+          (error as RTQApiError)?.data?.detail || "Something went wrong. Please try again.",
       });
     }
   };

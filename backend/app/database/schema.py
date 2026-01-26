@@ -33,7 +33,7 @@ class VideoResponse(BaseModel):
     processing_error:Optional[str]
     s3_key: str
     created_at: datetime
-    updated_at: datetime
+    updated_at: Optional[datetime] = None
     status: VideoStatus
     segments: Optional[List[SegmentResponse]] = None
     ai_title: Optional[str] = None

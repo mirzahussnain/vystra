@@ -70,7 +70,8 @@ export default function PricingPage() {
         console.log("Failed to upgrade user plan");
       }
     } catch (error) {
-      console.error("Error:", error?.data?.detail);
+      const err = error as { data?: { detail?: string } };
+      console.error("Error:", err?.data?.detail);
     }
     finally {
       setLoadingPlanId(null);

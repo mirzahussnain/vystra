@@ -44,7 +44,7 @@ export function FailedVideoState({ reason, id }: { reason?: string, id?: string 
           Back to Library
         </Button>
         <Button variant="destructive"
-          onClick={() => handleDelete(id)}>
+          onClick={() => handleDelete(id as string)}>
           <Trash2 className="w-4 h-4 mr-2" />
           Delete Video
         </Button>

@@ -1,26 +1,5 @@
+import { UserStats } from "@/lib/types";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-interface StatsState {
-  id: string;
-  plan: string;
-  storage: {
-    used_bytes: number;
-    limit_bytes: number;
-    percent: number;
-    is_full: boolean;
-  };
-  processing: {
-    used_minutes: number;
-    limit_minutes: number;
-    percent: number;
-    is_full: boolean;
-  };
-  ai_credits: {
-    used_actions: number;
-    limit_actions: number;
-    remaining: number;
-    is_empty: boolean;
-  };
-}
 const statsSlice = createSlice({
   name:"stats",
   initialState: {
@@ -46,7 +25,7 @@ const statsSlice = createSlice({
     },
   },
   reducers: {
-    setStats: (state, action: PayloadAction<StatsState>) => {
+    setStats: (state, action: PayloadAction<UserStats>) => {
       return action.payload;
     },
   },

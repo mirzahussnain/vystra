@@ -39,7 +39,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <ClerkAuthProvider>
-            <StoreProvider>
+            <StoreProvider >
               {children}
               <Toaster position="top-center" />
             </StoreProvider>

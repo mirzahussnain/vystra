@@ -30,10 +30,10 @@ export default function TermsOfService() {
           <div>
             <h1 className="text-4xl font-bold tracking-tight text-foreground">Terms of Service</h1>
             <p className="text-muted-foreground mt-2 text-lg">
-              The rules defining the use of Vystra's platform.
+              {"The rules defining the use of Vystra's platform."}
             </p>
             <p className="text-xs text-muted-foreground/60 mt-1 uppercase tracking-widest font-medium">
-              Last Updated: January 26, 2026
+              {"Last Updated: January 26, 2026"}
             </p>
           </div>
         </div>
@@ -47,9 +47,9 @@ export default function TermsOfService() {
               <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-400" />
             </div>
             <div>
-              <h3 className="font-semibold text-amber-700 dark:text-amber-300 text-sm">"As Is" Disclaimer</h3>
+              <h3 className="font-semibold text-amber-700 dark:text-amber-300 text-sm">{`"As Is" Disclaimer`}</h3>
               <p className="text-amber-600/80 dark:text-amber-400/80 text-sm mt-1 leading-relaxed">
-                During this Beta phase, the service is provided "as is" and "as available" without warranties of any kind regarding uptime or data persistence.
+                {`During this Beta phase, the service is provided "as is" and "as available" without warranties of any kind regarding uptime or data persistence.`}
               </p>
             </div>
           </div>
@@ -61,9 +61,9 @@ export default function TermsOfService() {
               title="1. Agreement to Terms"
             >
               <p>
-                By creating an account or uploading video content to Vystra, you agree to these Terms. 
+               { `By creating an account or uploading video content to Vystra, you agree to these Terms. 
                 If you do not agree, you must discontinue use immediately. We reserve the right to modify these terms 
-                as we transition from Beta to full release.
+                as we transition from Beta to full release.`}
               </p>
             </Section>
 
@@ -72,8 +72,8 @@ export default function TermsOfService() {
               title="2. Service Description"
             >
               <p>
-                Vystra is an AI-powered video analysis tool. We offer limited free access for demonstration purposes 
-                and premium tiers for heavy usage.
+               {` Vystra is an AI-powered video analysis tool. We offer limited free access for demonstration purposes 
+                 and premium tiers for heavy usage.`}
               </p>
               <ul className="list-disc pl-5 space-y-2 mt-4 text-muted-foreground">
                 <li><strong>Free Tier:</strong> Subject to strict usage limits (e.g., 15-minute videos).</li>
@@ -86,7 +86,7 @@ export default function TermsOfService() {
               title="3. Prohibited Conduct"
             >
               <p>
-                You retain ownership of your content, but you agree NOT to upload:
+               {` You retain ownership of your content, but you agree NOT to upload:`}
               </p>
               <ul className="list-disc pl-5 space-y-2 mt-4 text-muted-foreground">
                 <li>Material that violates copyright or intellectual property laws.</li>
