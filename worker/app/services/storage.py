@@ -1,4 +1,5 @@
 import boto3
+from botocore.config import Config
 from botocore.exceptions import ClientError
 from ..core.config import settings
 
@@ -8,7 +9,9 @@ def get_s3_client():
         's3',
         aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
         aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
-        endpoint_url=settings.AWS_ENDPOINT_URL
+        endpoint_url=settings.AWS_ENDPOINT_URL,
+        config=Config(signature_version='s3v4'),
+        region_name="auto"
     )
     
     

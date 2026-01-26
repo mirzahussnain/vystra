@@ -42,6 +42,7 @@ services:
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
       - AWS_ENDPOINT_URL=${AWS_ENDPOINT_URL}
       - AWS_BUCKET_NAME=${AWS_BUCKET_NAME}
+      - R2_PUBLIC_URL=${R2_PUBLIC_URL}
       - PYTHONPATH=/app
     depends_on:
       - redis
@@ -72,6 +73,7 @@ services:
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
       - AWS_ENDPOINT_URL=${AWS_ENDPOINT_URL}
       - AWS_BUCKET_NAME=${AWS_BUCKET_NAME}
+      - R2_PUBLIC_URL=${R2_PUBLIC_URL}
       - ENVIRONMENT=${ENVIRONMENT}
       - PYTHONPATH=/app
       - OMP_NUM_THREADS=1 # Prevents CPU thrashing

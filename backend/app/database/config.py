@@ -10,7 +10,7 @@ Base = declarative_base()
 
 
 
-# Dependency (We use this in FastAPI endpoints)
+
 def get_db():
     db = SessionLocal()
     try:
@@ -24,4 +24,4 @@ def create_extension():
     with engine.connect() as connection:
         connection.execute(text("CREATE EXTENSION IF NOT EXISTS vector"))
         connection.commit()
-        print("✅ 'vector' extension enabled.")
+        print(" 'vector' extension enabled.")

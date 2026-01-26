@@ -32,21 +32,25 @@ def get_s3_client(for_browser=False):
     # Otherwise, use the internal endpoint (http://minio:9000).
     if for_browser and is_dev:
         endpoint = "http://127.0.0.1:9000"
+        config=Config(
+            signature_version='s3v4',
+            s3={'addressing_style': 'path'}
+        )
     else:
         endpoint = settings.AWS_ENDPOINT_URL
+        config=Config(
+            signature_version='s3v4',
+        )
 
     return boto3.client(
         's3',
         aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
         aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
         endpoint_url=endpoint,
-        # ✅ FIX 1: Path addressing is mandatory for 127.0.0.1/IP access
-        config=Config(
-            signature_version='s3v4',
-            s3={'addressing_style': 'path'}
-        ),
-        # ✅ FIX 2: Use a standard region to prevent signature mismatches
-        region_name= 'us-east-1'
+        # FIX 1: Path addressing is mandatory for 127.0.0.1/IP access
+        config=config,
+        # FIX 2: Use a standard region to prevent signature mismatches
+        region_name= 'us-east-1'if is_dev else'auto'
     )
     
 def init_bucket():

@@ -13,6 +13,7 @@ class Settings:
     _aws_endpoint_url = os.getenv("AWS_ENDPOINT_URL", "http://minio:9000")
     _bucket_name = os.getenv("AWS_BUCKET_NAME", "videos")
     _groq_api_key=os.getenv("GROQ_API_KEY")
+    _r2_public_url=os.getenv("R2_PUBLIC_URL")
 
     if _redis_url is None:
         raise ValueError("REDIS_URL is not set in .env file")
@@ -30,6 +31,8 @@ class Settings:
         raise ValueError("GROQ_API_KEY is not set in .env file")
     if _database_url is None:
         raise ValueError("DATABASE_URL is not set in .env file")
+    if _r2_public_url is None:
+        raise ValueError("R2_PUBLIC_URL is not set in .env file")
 
     # Redis
     REDIS_URL: str = _redis_url
@@ -39,6 +42,7 @@ class Settings:
     AWS_SECRET_ACCESS_KEY: str = _aws_secret_access_key
     AWS_ENDPOINT_URL: str = _aws_endpoint_url
     AWS_BUCKET_NAME: str = _bucket_name
+    R2_PUBLIC_URL: str = _r2_public_url
 
     # Database
     DATABASE_URL: str = _database_url
