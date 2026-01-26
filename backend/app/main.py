@@ -51,7 +51,7 @@ app.include_router(payments_router, prefix="/api/v1/payments", tags=["Payments"]
 
 @app.get("/")
 def read_root():
-    if(settings.ENVIRONMENT != "development"):
+    if(settings.ENVIRONMENT == "development"):
         return {"status": "online", "storage": "minio", "db": "postgres", "cache": "redis"}
     return {"status": "online", "storage": "cloudflare-R2", "db": "NeonDB","cache": "upstash-redis"}
     
