@@ -16,9 +16,9 @@ export default function Home() {
       <Hero />
       <Features />
       <DemoSection />
+      <HowItWorks />
       <UseCaseMarquee />
       <PricingPage/>
-      <HowItWorks />
       
     </main>
   );

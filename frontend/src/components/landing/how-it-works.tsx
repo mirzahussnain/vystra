@@ -6,26 +6,26 @@ import { Upload, Cpu, Database, Search, ArrowRight } from "lucide-react";
 const steps = [
   {
     icon: Upload,
-    title: "1. Upload",
-    desc: "Video is streamed directly to MinIO Object Storage (S3 Compatible).",
-    tech: "FastAPI + MinIO",
+    title: "1. Secure Upload",
+    desc: "Videos are streamed directly to Cloudflare R2 (S3-Compatible) with global edge delivery.",
+    tech: "FastAPI + Cloudflare R2",
   },
   {
     icon: Cpu,
-    title: "2. Process",
-    desc: "Celery workers pick up the task and run OpenAI Whisper inference.",
-    tech: "Python + Redis + Celery",
+    title: "2. AI Inference",
+    desc: "Distributed Celery workers process audio through Groq LPUs for lightning-fast transcription.",
+    tech: "RabbitMQ + Celery + Groq AI",
   },
   {
     icon: Database,
-    title: "3. Index",
-    desc: "Timestamps and semantic text vectors are stored for instant retrieval.",
-    tech: "Postgres + pgvector",
+    title: "3. Vector Indexing",
+    desc: "Semantic text vectors and metadata are stored in Neon for instant, high-concurrency retrieval.",
+    tech: "Postgres + pgvector + Neon",
   },
   {
     icon: Search,
-    title: "4. Search",
-    desc: "Query your library in milliseconds using our Next.js dashboard.",
+    title: "4. Semantic Search",
+    desc: "Query your library using natural language with a high-performance Next.js interface.",
     tech: "Next.js + Framer Motion",
   },
 ];
