@@ -8,8 +8,8 @@ import { MobileNavProps } from "@/lib/types";
     { label: "Home", href: "/",id:"home" },
     { label: "Features", href: "#features", id: "features" },
     {label:"Demo",href:"#demo-section",id:"demo-section"},
-    { label: "Pricing", href: "#pricing",id:"pricing" },
     { label: "Working", href: "#how-it-works",id:"how-it-works" },
+    { label: "Pricing", href: "#pricing",id:"pricing" },
     // { label: "Docs", href: "#docs",id:"docs" },
   ];
 
