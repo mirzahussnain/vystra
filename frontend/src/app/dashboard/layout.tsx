@@ -156,7 +156,7 @@ export default function DashboardLayout({
         <main className="flex-1 overflow-y-auto p-6 md:p-8 relative">
           
           {/*Auth and Plan Logic */}
-          <Suspense fallback={null}>
+          <Suspense fallback={<Loader text="Loading user data..." />}>
             <DashboardLogic 
               stats={stats} 
               authLoaded={authLoaded} 

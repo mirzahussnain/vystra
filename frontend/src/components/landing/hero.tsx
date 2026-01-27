@@ -10,7 +10,7 @@ export function Hero() {
   const [isHovering, setIsHovering] = useState(false);
   const { isSignedIn, isLoaded } = useUser();
 
-  // ✅ SEO LOGIC: Determine destination immediately
+  // SEO LOGIC: Determine destination immediately
   // Default to sign-up (for Google Bot/Guests)
   // If loaded and signed in, switch to dashboard
   const destinationLink = (isLoaded && isSignedIn) 
@@ -105,7 +105,7 @@ export function Hero() {
         <p className="mt-6 text-sm text-muted-foreground">
           No video?{" "}
           <Link
-            href="/demo" // Ideally a real route
+            href="#demo-section" // Ideally a real route
             className="text-primary hover:underline underline-offset-4"
           >
             Try a demo file
