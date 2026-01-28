@@ -1,4 +1,4 @@
-# Vystra 🎥 (AI Intelligence — Integrated)
+# Vystra — AI-Powered Video Search & Insights
 
 [![Docker](https://img.shields.io/badge/docker-ready-blue.svg)](https://www.docker.com/)
 [![Groq](https://img.shields.io/badge/groq-integrated-purple.svg)](#)
@@ -6,254 +6,232 @@
 [![pgvector](https://img.shields.io/badge/pgvector-enabled-lightgrey.svg)](#)
 [![Status](https://img.shields.io/badge/status-active-brightgreen.svg)](#)
 
-> AI-Powered Video Search Engine & SaaS Platform — transcribe, index, and semantically search video content end-to-end.
-
-InsightStream is a microservices application that converts uploaded videos into searchable knowledge. Videos are ingested, audio is extracted (FFmpeg), speech is transcribed (Groq Whisper), embeddings are generated (FastEmbed), vectors are stored and indexed with `pgvector` (HNSW), and semantic search is exposed via a `FastAPI` backend with a modern `Next.js` frontend.
+Vystra converts uploaded video content into searchable, vector-indexed segments. By leveraging AI-driven transcription, semantic vector search, and structured insights, Vystra enables users to discover specific moments and actionable summaries across their video library.
 
 ---
 
 ## Table of Contents
 
-- [Summary of Progress](#-summary-of-progress)
-- [Architecture & Tech Stack](#-architecture--tech-stack)
-- [Feature Status](#-feature-status)
-- [Installation & Setup](#-installation--setup)
+- [Overview](#overview)
+- [System architecture](#system-architecture)
+  - [Production flow (high-level)](#production-flow-high-level)
+  - [Local development flow](#local-development-flow)
+- [Key features](#key-features)
+- [Tech stack](#tech-stack)
+- [Quickstart (local)](#quickstart-local)
   - [Prerequisites](#prerequisites)
-  - [Clone](#clone)
-  - [Environment (.env)](#configure-environment-env)
-  - [Launch (Docker Compose)](#launch-the-system)
-  - [Frontend (local dev)](#run-frontend-local-dev)
-- [Project Structure (high level)](#-project-structure-high-level)
-- [API Examples](#-api-examples)
-- [Model & Indexing Notes](#-model--indexing-notes)
-- [Contributing](#-contributing)
-- [License & Security Notes](#license--security-notes)
+  - [Clone & configure](#clone--configure)
+  - [Environment (.env) example](#environment-env-example)
+  - [Start services](#start-services)
+  - [Run frontend](#run-frontend)
+  - [Test upload (curl example)](#test-upload-curl-example)
+- [Stripe integration (billing)](#stripe-integration-billing)
+- [Deployment checklist (production)](#deployment-checklist-production)
+- [Contributing](#contributing)
+- [License](#license)
+- [References & code pointers](#references--code-pointers)
 
 ---
 
-## 🆕 Summary of Progress
+## Overview
 
-What I updated and verified in the codebase:
-- Complete AI pipeline implemented in the `worker`:
-  - Static `FFmpeg` binary bundled into the worker image for robust audio extraction.
-  - Transcription via Groq's Whisper (v3) through the `groq` client.
-  - Embeddings generated with `fastembed.TextEmbedding(model_name="BAAI/bge-small-en-v1.5")`.
-  - AI insight/summarization using Groq Llama 3 models.
-- Vector storage and search:
-  - `VideoSegment` embedding column uses `pgvector` (`Vector(384)`).
-  - HNSW vector index configured for fast nearest-neighbor search.
-- Backend and frontend:
-  - `FastAPI` backend handles uploads, task management, and semantic search endpoints.
-  - `Next.js` frontend (React 19) with `Clerk` for auth and Tailwind for UI.
-- Orchestration:
-  - `docker-compose` file includes `redis`, `db` (pgvector-enabled image), `minio`, `backend`, and `worker`.
+Vystra is a microservices platform that ingests videos, extracts and transcribes audio, generates embeddings, stores vectors in Postgres (pgvector + HNSW), produces structured insights (JSON), and exposes semantic search through a FastAPI backend and a Next.js frontend.
 
 ---
 
-## 🏗 Architecture & Tech Stack
+## System architecture
 
-- Backend: `FastAPI` (Python)
-- Worker: `Celery` + Python worker process
-- Broker: `Redis`
-- Object storage: `MinIO` (S3-compatible)
-- Database: `Postgres` with `pgvector` extension (HNSW index)
-- Transcription & LLMs: `Groq` (Whisper v3 for audio transcription, Llama 3 for insights)
-- Embeddings: `FastEmbed` (BAAI/bge-small-en-v1.5)
-- Audio tooling: Static `FFmpeg` binary included in `worker/Dockerfile`
-- Frontend: `Next.js` + `Clerk` + `Tailwind` + `Framer Motion`
-- Dev orchestration: `Docker Compose`
+### Production flow (high-level)
+
+The production environment uses managed services for scalability and reliability: Cloudflare R2 (object storage), RabbitMQ (broker), Upstash Redis (results cache), and a managed Postgres with pgvector (Neon or equivalent).
+
+<p align="center">
+  <img src="docs/assets/architecture-prod.svg" alt="Vystra Production Architecture" width="100%">
+</p>
+
+### Local development flow
+
+Local development uses `docker-compose` with MinIO, Redis, and a `pgvector`-enabled Postgres image to reproduce the full pipeline.
+
+<p align="center">
+  <img src="docs/assets/architecture-local.svg" alt="Vystra Local Development Architecture" width="100%">
+</p>
+
+---
+## End-to-End Workflow
+1.  **Handshake:** User selects a video. Frontend requests a secure **Presigned URL** from FastAPI.
+2.  **Direct Upload:** Frontend uploads the file directly to object storage (MinIO/R2), bypassing the backend server to reduce load and latency.
+3.  **Queueing:** Once the upload is confirmed, Frontend notifies the API, which enqueues a processing task in RabbitMQ/Redis.
+4.  **Processing:** A Celery Worker fetches the raw file, extracts audio via `ffmpeg`, and sends audio chunks for transcription.
+5.  **Indexing:** Transcripts are segmented and embedded into `Vector(384)`. These vectors are stored in Postgres (`pgvector`).
+6.  **Insight:** An LLM generates a structured summary, saved to the database.
+7.  **Search:** Users query the system; the backend performs an HNSW vector search to find the most relevant video segments instantly.
+8.  **Streaming:** Real-time transcription and insights are streamed back to the frontend for immediate feedback.
+---
+## Key features
+
+* **Direct-to-Cloud Uploads:** Frontend uploads directly to S3/R2 using presigned URLs, eliminating backend bottlenecks and ensuring unlimited file size scalability.
+* **Audio Intelligence:** Static `ffmpeg` builds included in workers for robust audio extraction and chunking.
+* **AI Transcription & Insights:** Utilizes Whisper-class models for text and LLMs for structured JSON summaries.
+* **Semantic Search:** Implements `pgvector` with HNSW indexing for millisecond-latency Approximate Nearest Neighbor (ANN) search.
+* **Scalable Pipeline:** Decoupled architecture using Celery and RabbitMQ (Production) or Redis (Local).
+* **Hybrid Storage:** S3-compatible support (MinIO for local, Cloudflare R2 for production).
+* **Billing Ready:** Native Stripe integration for subscription and metered usage billing.
 
 ---
 
-## ✅ Feature Status
+## Tech stack
 
-- Infrastructure
-  - [x] `docker-compose` monorepo
-  - [x] `Redis`, `Postgres` (pgvector), `MinIO`
-- Ingestion
-  - [x] Stream-based uploads (`UploadFile`) — minimal memory usage
-  - [x] UUID-based filenames, S3 (MinIO) persistence
-- Async Processing
-  - [x] `Celery` task queue and `task_id`-based status tracking
-- AI Pipeline (completed)
-  - [x] FFmpeg audio extraction (static binary in worker)
-  - [x] Groq Whisper transcription (`whisper-large-v3`)
-  - [x] FastEmbed vector generation (`BAAI/bge-small-en-v1.5`)
-  - [x] AI insights via Groq Llama 3 (structured JSON)
-  - [x] Vector storage with `pgvector` and HNSW index for fast retrieval
-- Frontend
-  - [x] `Next.js` UI with Clerk auth and upload/search flows
+- Frontend: `Next.js` (React)
+- Backend: `FastAPI` (Uvicorn)
+- Workers: `Celery` (Python)
+- Broker: `Redis` (local) / `RabbitMQ` (production)
+- Result cache: `Redis` / `Upstash Redis`
+- Database: `Postgres` + `pgvector` (HNSW)
+- Object storage: `MinIO` (local) / `Cloudflare R2` (prod)
+- AI providers: `Groq` (Whisper & Llama) and `FastEmbed`
+- Orchestration: `Docker Compose` (local); containers on Render / Heroku / K8s (prod)
 
 ---
 
-## 🛠 Installation & Setup
+## Quickstart (local)
 
 ### Prerequisites
-- Docker Desktop (or Docker + Docker Compose)
-- A `GROQ_API_KEY` (Groq account) for transcription & LLM calls
-- (Optional) `STRIPE` and `CLERK` keys if you intend to use billing/auth features
 
-### Clone the repository
+- Docker & Docker Compose
+- Node.js 18+ (for frontend)
+- Optional: `GROQ_API_KEY` for live transcription/LLM calls
 
-```insightstream/README.md#L150-153
-git clone https://github.com/YOUR_USERNAME/insightstream.git
-cd insightstream
+### Clone & configure
+
+```bash
+git clone https://github.com/YOUR_USERNAME/vystra.git
+cd vystra
+cp .env.example .env
 ```
 
-### Configure Environment — create a `.env` file at the project root (example)
+### Environment (.env) example
 
-```insightstream/README.md#L155-196
-# Postgres
-POSTGRES_USER=user
-POSTGRES_PASSWORD=password
-POSTGRES_DB=insightstream
-DATABASE_URL=postgresql://user:password@db:5432/insightstream
+Create `.env` in the repository root and populate values similar to the example below:
 
-# Redis
+```env
+# Database & Redis
+DATABASE_URL=postgresql://local_user:local_password@db:5432/vystra_dev
 REDIS_URL=redis://redis:6379/0
 
-# MinIO (S3)
-MINIO_ROOT_USER=minioadmin
-MINIO_ROOT_PASSWORD=minioadmin
+# Object Storage (MinIO)
 AWS_ACCESS_KEY_ID=minioadmin
 AWS_SECRET_ACCESS_KEY=minioadmin
 AWS_ENDPOINT_URL=http://minio:9000
-AWS_BUCKET_NAME=videos
+AWS_BUCKET_NAME=vystra-videos
 
-# Groq (for transcription + LLM)
+# AI Provider
 GROQ_API_KEY=your_groq_api_key_here
-
-# Optional (Clerk, Stripe, Svix)
-CLERK_ISSUER=...
-CLERK_WEBHOOK_SECRET=...
-STRIPE_API_KEY=...
-STRIPE_WEBHOOK_KEY=...
-SVIX_SECRET=...
 
 # Worker tuning
 OMP_NUM_THREADS=1
 MKL_NUM_THREADS=1
 ```
 
-> Security: Do not commit `.env` to the repo. Add it to `.gitignore`.
+> Keep secrets out of source control. Use your cloud provider's secret manager in production.
 
-### Launch core services
+### Start services
 
-```insightstream/README.md#L200-203
+```bash
 docker-compose up --build
 ```
 
-- The `worker` image includes an optimized static `ffmpeg` binary (no in-container apt installs).
-- The `db` service uses a `pgvector`-enabled image; backend code performs `CREATE EXTENSION IF NOT EXISTS vector` on startup.
+### Run frontend (local)
 
-### Run Frontend (local development)
-
-```insightstream/README.md#L206-210
+```bash
 cd frontend
 npm install
 npm run dev
 # Open http://localhost:3000
 ```
 
----
+### Test upload (curl example)
 
-## 📂 Project Structure (high level)
-
-```insightstream/README.md#L214-244
-insightstream/
-├── docker-compose.yaml           # Services: redis, db (pgvector), minio, backend, worker
-├── backend/                      # FastAPI gateway and API
-│   └── app/
-│       ├── core/                 # config, settings
-│       ├── database/             # models.py, config.py (create_extension)
-│       ├── services/             # semantic_search.py (fastembed based)
-│       └── main.py               # FastAPI app entrypoint
-├── worker/                       # Celery worker & AI pipeline
-│   ├── Dockerfile                # copies static ffmpeg binary
-│   └── app/
-│       ├── core/
-│       │   └── model_loader.py   # loads fastembed & groq clients
-│       ├── helpers/
-│       │   └── video_processing.py # audio extraction, transcription, embeddings, AI insights
-│       └── worker.py             # Celery tasks
-├── frontend/                     # Next.js + Clerk UI
-│   └── package.json
-```
-
-Key files to inspect and modify:
-- `worker/app/helpers/video_processing.py` — Groq transcription, FastEmbed embedding, Llama insights
-- `worker/app/core/model_loader.py` — loads `fastembed.TextEmbedding` and `groq.Groq` client
-- `worker/Dockerfile` — copies static `ffmpeg` binary into image
-- `backend/app/database/models.py` — `Video` and `VideoSegment` models with `Vector(384)` embedding column and HNSW index
-- `backend/app/services/semantic_search.py` — query embedding + DB nearest-neighbor search
-
----
-
-## 📡 API Examples
-
-Upload a video (multipart/form-data):
-
-```insightstream/README.md#L250-260
+```bash
 curl -X POST "http://localhost:8000/api/v1/upload" \
   -H "accept: application/json" \
   -H "Content-Type: multipart/form-data" \
-  -F "file=@my_video.mp4;type=video/mp4"
+  -F "file=@demo_video.mp4;type=video/mp4"
 ```
 
-Typical upload response:
+---
 
-```insightstream/README.md#L262-270
-{
-  "status": "queued",
-  "video_id": "550e8400-e29b-41d4-a716-446655440000.mp4",
-  "task_id": "8756c9a7-9800-4593-b23d-176882647d32",
-  "message": "Video uploaded and processing started."
-}
+## Stripe integration (billing)
+
+Vystra supports subscription and metered billing. The worker records processed seconds and the backend can report usage to Stripe for metered plans.
+
+Minimal FastAPI webhook handler:
+
+```python
+from fastapi import FastAPI, Request, Header, HTTPException
+import stripe
+
+app = FastAPI()
+stripe.api_key = STRIPE_SECRET_KEY
+
+@app.post("/webhook")
+async def stripe_webhook(request: Request, stripe_signature: str = Header(None)):
+    payload = await request.body()
+    try:
+        event = stripe.Webhook.construct_event(payload, stripe_signature, STRIPE_WEBHOOK_SECRET)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+    if event["type"] == "checkout.session.completed":
+        # Provision user access / store customer mapping
+        pass
+
+    return {"status": "ok"}
 ```
 
-Search the transcript (semantic search):
+---
 
-```insightstream/README.md#L272-281
-curl -G "http://localhost:8000/api/v1/search" \
-  --data-urlencode "q=product roadmap discussion" \
-  --data-urlencode "limit=5" \
-  -H "accept: application/json" \
-  -H "Authorization: Bearer <user_token>"
-```
+## Deployment checklist (production)
 
-Search responses return matching `VideoSegment` objects with `start_time`, `end_time`, `content`, and similarity info.
+- Database
+  - [✅] Provision managed Postgres (Neon or similar) and enable `pgvector`.
+  - [✅] Run DB migrations (including `CREATE EXTENSION IF NOT EXISTS vector;`).
+- Storage & broker
+  - [✅] Create Cloudflare R2 bucket and configure CORS / lifecycle policies.
+  - [✅] Provision RabbitMQ (CloudAMQP) and set `CELERY_BROKER_URL`.
+  - [✅] Provision Upstash Redis (or managed Redis) for result caching.
+- Workers & images
+  - [✅] Build and publish the worker image (include static `ffmpeg`).
+  - [✅] Ensure the worker image targets the required platform (e.g., `linux/amd64`).
+- Security & secrets
+  - [✅] Store GROQ, STRIPE, and other secrets in the cloud provider secret manager.
+  - [✅] Use `rediss://` for Upstash / Redis TLS endpoints.
+- Observability
+  - [ ] Implement logging and tracing for backend and workers.
 
 ---
 
-## 🔬 Models & Indexing Notes
+## Contributing
 
-- Transcription: Groq Whisper (`whisper-large-v3`) endpoint is used in `video_processing.generate_transcription`.
-- Embeddings: `fastembed.TextEmbedding(model_name="BAAI/bge-small-en-v1.5")` is used in both worker and backend to ensure a consistent vector space.
-- Vector storage: `pgvector` stores fixed-size vectors; the code sets `Vector(384)` and an HNSW index with tuned parameters (`m`, `ef_construction`) for performance.
-- AI insights: Groq Llama 3 (`llama-3.1-8b-instant`) is used to create structured JSON summaries and action items.
-- Worker performance: `OMP_NUM_THREADS` and `MKL_NUM_THREADS` are set to `1` in container env to prevent CPU oversubscription when running numeric workloads.
+- Fork the repository and create a feature branch: `git checkout -b feature/your-feature`
+- Commit and push changes, then open a PR into `develop`.
+- If you change the embedding model, update the Postgres vector column dimension and reindex.
 
 ---
 
-## 🤝 Contributing
+## License
 
-- Branching model: work from `develop`, open PRs into `develop`.
-- For model or pipeline updates, update `worker/app/core/model_loader.py`, add tests, and document behavior.
-- If you change embedding model or vector dimension, update `backend/app/database/models.py` (`Vector(...)`) and DB migration scripts accordingly.
+Distributed under the MIT License. See `LICENSE` for details.
 
 ---
 
-## License & Security Notes
+## References & code pointers
 
-- Add a `LICENSE` file to the repo and update the badge at the top.
-- Never commit `.env` or API keys to source control.
-- Groq API usage may incur cost — monitor usage and set rate limits if needed.
-- When enabling external webhooks (Clerk, Stripe), secure and verify webhook payloads (the project includes `svix` for webhook security).
+Inspect these modules for implementation details:
+
+- `worker/app/helpers/video_processing.py` — audio extraction, transcription, embeddings, insights
+- `worker/app/core/model_loader.py` — FastEmbed and Groq client initialization
+- `backend/app/database/models.py` — `Video` and `VideoSegment` models (Vector column)
+- `backend/app/services/semantic_search.py` — query embedding and ANN search
 
 ---
-
-If you'd like, I can:
-- Create this README file in the repository for you, or
-- Produce a focused "What's changed" diff to review only the modifications.
-
-If you want me to write the README into the repository now, tell me and I will proceed.
