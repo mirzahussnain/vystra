@@ -35,7 +35,7 @@ Vystra converts uploaded video content into searchable, vector-indexed segments.
 
 ## Overview
 
-Vystra is a microservices platform that ingests videos, extracts and transcribes audio, generates embeddings, stores vectors in Postgres (pgvector + HNSW), produces structured insights (JSON), and exposes semantic search through a FastAPI backend and a Next.js frontend.
+Vystra is a scalable AI integrated Saas platform that ingests videos, extracts and transcribes audio, generates embeddings, stores vectors in Postgres (pgvector + HNSW), produces structured insights (JSON), and exposes semantic search through a FastAPI backend and a Next.js frontend.
 
 ---
 
